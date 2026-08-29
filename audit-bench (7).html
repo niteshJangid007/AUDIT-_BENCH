@@ -1,0 +1,1329 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Audit Bench — OWASP Top 10 Code Review</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
+<style>
+  :root{
+    --ink:#11141b;
+    --panel:#181c26;
+    --panel-2:#1f2430;
+    --line:#2a2f3d;
+    --paper:#e9e7e0;
+    --paper-dim:#9aa0ae;
+    --alarm:#e8483a;
+    --alarm-dim:#3a1f1e;
+    --caution:#e8a23a;
+    --caution-dim:#3a301c;
+    --clear:#3fbf9f;
+    --clear-dim:#1a332c;
+    --info:#5b8def;
+    --info-dim:#1c2740;
+  }
+  *{box-sizing:border-box; margin:0; padding:0;}
+  html,body{background:var(--ink); color:var(--paper); font-family:'Inter',sans-serif; min-height:100vh;}
+  body{
+    background-image:
+      linear-gradient(var(--line) 1px, transparent 1px),
+      linear-gradient(90deg, var(--line) 1px, transparent 1px);
+    background-size: 64px 64px;
+    background-position: -1px -1px;
+    background-attachment: fixed;
+    background-color: var(--ink);
+  }
+  .mono{font-family:'JetBrains Mono', monospace;}
+  ::selection{background:var(--alarm); color:#fff;}
+
+  /* ===== Header ===== */
+  header{
+    border-bottom:1px solid var(--line);
+    background:rgba(17,20,27,0.85);
+    backdrop-filter: blur(6px);
+    position:sticky; top:0; z-index:50;
+  }
+  .header-inner{
+    max-width:1280px; margin:0 auto; padding:18px 28px;
+    display:flex; align-items:center; justify-content:space-between; gap:24px;
+  }
+  .brand{display:flex; align-items:center; gap:12px;}
+  .brand-mark{
+    width:34px; height:34px; border-radius:4px;
+    background: repeating-linear-gradient(45deg, var(--alarm), var(--alarm) 4px, transparent 4px, transparent 8px);
+    border:1px solid var(--alarm);
+    position:relative;
+    flex-shrink:0;
+  }
+  .brand-mark::after{
+    content:"";
+    position:absolute; inset:5px;
+    background:var(--ink);
+    display:flex;
+  }
+  .brand-text .t1{font-family:'JetBrains Mono'; font-weight:800; font-size:15px; letter-spacing:0.5px;}
+  .brand-text .t2{font-size:11px; color:var(--paper-dim); letter-spacing:1.5px; text-transform:uppercase; font-family:'JetBrains Mono';}
+  nav{display:flex; gap:28px; font-family:'JetBrains Mono'; font-size:12px; letter-spacing:0.5px; color:var(--paper-dim);}
+  nav span{color:var(--clear);}
+
+  /* ===== Hero ===== */
+  .hero{max-width:1280px; margin:0 auto; padding:64px 28px 40px;}
+  .hero-tag{
+    font-family:'JetBrains Mono'; font-size:11px; letter-spacing:2px; text-transform:uppercase;
+    color:var(--alarm); display:flex; align-items:center; gap:10px; margin-bottom:22px;
+  }
+  .hero-tag::before{content:"●"; animation:blink 1.6s infinite;}
+  @keyframes blink{0%,100%{opacity:1} 50%{opacity:0.15}}
+  h1{
+    font-family:'JetBrains Mono'; font-weight:800; font-size:clamp(30px,5vw,52px);
+    line-height:1.05; letter-spacing:-1px; max-width:820px;
+  }
+  h1 em{font-style:normal; color:var(--alarm);}
+  .hero-sub{
+    margin-top:20px; max-width:640px; color:var(--paper-dim); font-size:16px; line-height:1.6;
+  }
+  .owasp-strip{
+    margin-top:36px; display:flex; flex-wrap:wrap; gap:8px;
+  }
+  .owasp-chip{
+    font-family:'JetBrains Mono'; font-size:10.5px; padding:6px 10px; border:1px solid var(--line);
+    border-radius:3px; color:var(--paper-dim); letter-spacing:0.3px;
+  }
+
+  /* ===== Main workbench ===== */
+  .bench{max-width:1280px; margin:0 auto; padding:20px 28px 100px;}
+  .grid{
+    display:grid; grid-template-columns: 1fr 1fr; gap:20px; align-items:start;
+  }
+  @media (max-width:980px){ .grid{grid-template-columns:1fr;} }
+
+  .panel{
+    background:var(--panel); border:1px solid var(--line); border-radius:8px; overflow:hidden;
+  }
+  .panel-head{
+    display:flex; align-items:center; justify-content:space-between;
+    padding:14px 18px; border-bottom:1px solid var(--line); background:var(--panel-2);
+  }
+  .panel-head .label{
+    font-family:'JetBrains Mono'; font-size:11px; letter-spacing:1.5px; text-transform:uppercase; color:var(--paper-dim);
+  }
+  .dots{display:flex; gap:6px;}
+  .dots span{width:8px; height:8px; border-radius:50%; background:var(--line);}
+
+  select{
+    background:var(--panel-2); color:var(--paper); border:1px solid var(--line); border-radius:4px;
+    font-family:'JetBrains Mono'; font-size:12px; padding:7px 10px; outline:none; cursor:pointer;
+  }
+
+  textarea{
+    width:100%; min-height:420px; resize:vertical; background:var(--panel);
+    color:var(--paper); border:none; outline:none; padding:18px;
+    font-family:'JetBrains Mono'; font-size:13px; line-height:1.65; tab-size:2;
+  }
+  textarea::placeholder{color:#4a5062;}
+
+  .actions{
+    display:flex; align-items:center; justify-content:space-between; gap:12px;
+    padding:14px 18px; border-top:1px solid var(--line); background:var(--panel-2);
+  }
+  .scan-btn{
+    font-family:'JetBrains Mono'; font-weight:700; font-size:13px; letter-spacing:0.5px;
+    background:var(--alarm); color:#fff; border:none; border-radius:5px; padding:12px 22px;
+    cursor:pointer; display:flex; align-items:center; gap:9px; transition:transform .12s, box-shadow .12s;
+    box-shadow: 0 0 0 0 rgba(232,72,58,0.5);
+  }
+  .scan-btn:hover{transform:translateY(-1px); box-shadow:0 4px 18px rgba(232,72,58,0.35);}
+  .scan-btn:active{transform:translateY(0);}
+  .scan-btn:disabled{opacity:0.5; cursor:not-allowed; transform:none; box-shadow:none;}
+  .sample-btn{
+    font-family:'JetBrains Mono'; font-size:11.5px; color:var(--paper-dim); background:none; border:1px solid var(--line);
+    border-radius:5px; padding:11px 14px; cursor:pointer;
+  }
+  .sample-btn:hover{color:var(--paper); border-color:var(--paper-dim);}
+
+  /* ===== Report side ===== */
+  .report-body{ padding:0; max-height:640px; overflow-y:auto; }
+  .report-empty{
+    padding:60px 30px; text-align:center; color:var(--paper-dim);
+  }
+  .report-empty .glyph{font-size:32px; margin-bottom:14px; opacity:0.5;}
+  .report-empty .mono{font-size:12px; letter-spacing:0.5px;}
+
+  .summary-bar{
+    display:flex; gap:0; border-bottom:1px solid var(--line);
+  }
+  .sum-cell{flex:1; padding:14px 16px; text-align:center; border-right:1px solid var(--line);}
+  .sum-cell:last-child{border-right:none;}
+  .sum-cell .n{font-family:'JetBrains Mono'; font-weight:800; font-size:22px;}
+  .sum-cell .l{font-family:'JetBrains Mono'; font-size:9.5px; letter-spacing:1px; text-transform:uppercase; color:var(--paper-dim); margin-top:2px;}
+  .sum-cell.crit .n{color:var(--alarm);}
+  .sum-cell.med .n{color:var(--caution);}
+  .sum-cell.low .n{color:var(--info);}
+  .sum-cell.clean .n{color:var(--clear);}
+
+  .finding{ border-bottom:1px solid var(--line); }
+  .finding:last-child{border-bottom:none;}
+  .finding-head{
+    padding:16px 18px; display:flex; gap:12px; align-items:flex-start; cursor:pointer;
+  }
+  .sev-tag{
+    font-family:'JetBrains Mono'; font-size:9.5px; font-weight:700; letter-spacing:0.5px; text-transform:uppercase;
+    padding:3px 7px; border-radius:3px; flex-shrink:0; margin-top:2px; white-space:nowrap;
+  }
+  .sev-critical{background:var(--alarm-dim); color:var(--alarm); border:1px solid var(--alarm);}
+  .sev-medium{background:var(--caution-dim); color:var(--caution); border:1px solid var(--caution);}
+  .sev-low{background:var(--info-dim); color:var(--info); border:1px solid var(--info);}
+
+  .finding-title{font-size:14px; font-weight:600; line-height:1.4;}
+  .finding-meta{
+    font-family:'JetBrains Mono'; font-size:10.5px; color:var(--paper-dim); margin-top:4px; letter-spacing:0.3px;
+  }
+  .finding-body{
+    padding:0 18px 20px 18px; display:none;
+  }
+  .finding.open .finding-body{display:block;}
+  .finding-body p{font-size:13px; color:#c7c5bd; line-height:1.65; margin-bottom:14px;}
+
+  .code-line{
+    font-family:'JetBrains Mono'; font-size:12px; background:#0e1015; border:1px solid var(--line);
+    border-radius:5px; padding:10px 12px; overflow-x:auto; white-space:pre; margin-bottom:14px;
+  }
+  .code-line.bad{border-left:3px solid var(--alarm);}
+  .code-line.good{border-left:3px solid var(--clear);}
+
+  .fix-label{
+    font-family:'JetBrains Mono'; font-size:10px; letter-spacing:1px; text-transform:uppercase;
+    color:var(--paper-dim); margin-bottom:6px; display:flex; align-items:center; gap:6px;
+  }
+  .fix-label.good{color:var(--clear);}
+  .fix-label.bad{color:var(--alarm);}
+
+  /* ===== Annotated code (signature element) ===== */
+  .annotated-wrap{
+    margin-top:20px; border-top:1px solid var(--line);
+  }
+  .annotated-head{
+    padding:14px 18px; border-bottom:1px solid var(--line); background:var(--panel-2);
+    font-family:'JetBrains Mono'; font-size:11px; letter-spacing:1.5px; text-transform:uppercase; color:var(--paper-dim);
+  }
+  .code-table{width:100%; border-collapse:collapse; font-family:'JetBrains Mono'; font-size:12.5px;}
+  .code-table tr{border-bottom:1px solid #1a1e28;}
+  .code-table td{padding:3px 10px; vertical-align:top; white-space:pre;}
+  .ln{color:#4a5062; text-align:right; width:38px; user-select:none;}
+  .gutter{width:14px; text-align:center;}
+  .gutter .m{display:inline-block; width:8px; height:8px; border-radius:50%; margin-top:4px;}
+  .code-table tr.flag-critical{background:rgba(232,72,58,0.08);}
+  .code-table tr.flag-medium{background:rgba(232,162,58,0.07);}
+  .code-table tr.flag-low{background:rgba(91,141,239,0.06);}
+  .src{color:#d7d5cd;}
+
+  footer{
+    border-top:1px solid var(--line); padding:26px 28px; text-align:center;
+    font-family:'JetBrains Mono'; font-size:11px; color:var(--paper-dim); letter-spacing:0.5px;
+  }
+
+  /* ===== Theme toggle + panel ===== */
+  .theme-btn{
+    font-family:'JetBrains Mono'; font-size:11px; letter-spacing:0.5px; color:var(--paper-dim);
+    background:none; border:1px solid var(--line); border-radius:5px; padding:8px 12px; cursor:pointer;
+    display:flex; align-items:center; gap:7px;
+  }
+  .theme-btn:hover{color:var(--paper); border-color:var(--paper-dim);}
+  .swatch-dot{width:10px; height:10px; border-radius:50%; background:var(--alarm); border:1px solid rgba(255,255,255,0.25);}
+
+  .theme-panel{
+    display:none;
+    max-width:1280px; margin:0 auto; padding:0 28px 24px;
+  }
+  .theme-panel.open{display:block;}
+  .theme-panel-inner{
+    background:var(--panel); border:1px solid var(--line); border-radius:8px; padding:20px 22px;
+  }
+  .theme-panel-head{
+    display:flex; align-items:center; justify-content:space-between; margin-bottom:16px;
+  }
+  .theme-panel-head .label{
+    font-family:'JetBrains Mono'; font-size:11px; letter-spacing:1.5px; text-transform:uppercase; color:var(--paper-dim);
+  }
+  .theme-close{
+    background:none; border:none; color:var(--paper-dim); cursor:pointer; font-size:16px; line-height:1;
+  }
+  .theme-close:hover{color:var(--paper);}
+
+  .custom-pickers{
+    display:flex; flex-wrap:wrap; gap:18px; margin-bottom:20px; padding-bottom:20px; border-bottom:1px solid var(--line);
+  }
+  .picker-group{display:flex; flex-direction:column; gap:6px;}
+  .picker-group label{
+    font-family:'JetBrains Mono'; font-size:10px; letter-spacing:1px; text-transform:uppercase; color:var(--paper-dim);
+  }
+  .picker-group input[type=color]{
+    width:56px; height:34px; border:1px solid var(--line); border-radius:5px; background:none; cursor:pointer; padding:2px;
+  }
+  .reset-theme-btn{
+    align-self:flex-end; font-family:'JetBrains Mono'; font-size:11px; color:var(--paper-dim);
+    background:none; border:1px solid var(--line); border-radius:5px; padding:8px 12px; cursor:pointer; height:34px;
+  }
+  .reset-theme-btn:hover{color:var(--paper); border-color:var(--paper-dim);}
+
+  .palette-scroll{
+    max-height:220px; overflow-y:auto; padding-right:4px;
+  }
+  .palette-grid{
+    display:grid; grid-template-columns:repeat(auto-fill, minmax(30px,1fr)); gap:6px;
+  }
+  .palette-swatch{
+    width:100%; aspect-ratio:1; border-radius:4px; border:1px solid rgba(255,255,255,0.12); cursor:pointer;
+    position:relative; transition:transform .08s;
+  }
+  .palette-swatch:hover{transform:scale(1.15); z-index:2; box-shadow:0 2px 10px rgba(0,0,0,0.4);}
+  .palette-swatch::after{
+    content: attr(data-name);
+    position:absolute; bottom:calc(100% + 6px); left:50%; transform:translateX(-50%);
+    background:#000; color:#fff; font-family:'JetBrains Mono'; font-size:9.5px; padding:3px 6px; border-radius:3px;
+    white-space:nowrap; opacity:0; pointer-events:none; transition:opacity .1s;
+  }
+  .palette-swatch:hover::after{opacity:1;}
+  .palette-count{
+    font-family:'JetBrains Mono'; font-size:10.5px; color:var(--paper-dim); margin-bottom:10px;
+  }
+
+  /* ===== URL / domain input ===== */
+  .url-row{
+    display:flex; gap:8px; padding:14px 18px; border-bottom:1px solid var(--line); background:var(--panel-2);
+    flex-wrap:wrap;
+  }
+  .url-row input[type=text]{
+    flex:1; min-width:180px; background:var(--panel); color:var(--paper); border:1px solid var(--line);
+    border-radius:5px; padding:9px 12px; font-family:'JetBrains Mono'; font-size:12px; outline:none;
+  }
+  .url-row input[type=text]:focus{border-color:var(--info);}
+  .url-row input[type=text]::placeholder{color:#4a5062;}
+  .fetch-btn{
+    font-family:'JetBrains Mono'; font-size:11.5px; font-weight:600; color:#fff; background:var(--info);
+    border:none; border-radius:5px; padding:9px 14px; cursor:pointer; white-space:nowrap;
+  }
+  .fetch-btn:hover{filter:brightness(1.1);}
+  .fetch-btn:disabled{opacity:0.5; cursor:not-allowed;}
+  .url-status{
+    width:100%; font-family:'JetBrains Mono'; font-size:11px; color:var(--paper-dim); padding-top:2px; display:none;
+  }
+  .url-status.show{display:block;}
+  .url-status.err{color:var(--alarm);}
+  .url-status.ok{color:var(--clear);}
+
+/* ===================== Auth screen ===================== */
+.auth-screen{
+  min-height:100vh;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  background:var(--ink);
+  padding:24px;
+}
+.auth-card{
+  width:100%;
+  max-width:380px;
+  background:var(--panel);
+  border:1px solid var(--line);
+  border-radius:10px;
+  padding:32px 28px;
+}
+.auth-error{
+  background:var(--alarm-dim);
+  color:var(--alarm);
+  border:1px solid var(--alarm);
+  border-radius:6px;
+  padding:10px 12px;
+  font-size:13px;
+  margin-bottom:16px;
+}
+.auth-notice{
+  background:var(--panel-2);
+  color:var(--paper);
+  border:1px solid var(--line);
+  border-radius:6px;
+  padding:10px 12px;
+  font-size:13px;
+  margin-bottom:16px;
+}
+.google-btn{
+  width:100%;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  gap:10px;
+  background:#fff;
+  color:#1f1f1f;
+  border:1px solid var(--line);
+  border-radius:6px;
+  padding:11px;
+  font-size:14px;
+  font-weight:600;
+  font-family:inherit;
+  cursor:pointer;
+}
+.google-btn:hover{ opacity:.9; }
+.auth-divider{
+  display:flex;
+  align-items:center;
+  gap:12px;
+  margin:20px 0;
+  color:var(--paper-dim);
+  font-size:12px;
+}
+.auth-divider::before,.auth-divider::after{
+  content:'';
+  flex:1;
+  height:1px;
+  background:var(--line);
+}
+.auth-label{
+  display:block;
+  font-size:12px;
+  color:var(--paper-dim);
+  margin:0 0 6px;
+}
+.auth-input{
+  width:100%;
+  background:var(--panel-2);
+  border:1px solid var(--line);
+  border-radius:6px;
+  padding:10px 12px;
+  color:var(--paper);
+  font-family:inherit;
+  font-size:14px;
+  margin-bottom:16px;
+}
+.auth-input:focus{ outline:none; border-color:var(--accent); }
+.auth-submit{
+  width:100%;
+  background:var(--accent);
+  color:#fff;
+  border:none;
+  border-radius:6px;
+  padding:11px;
+  font-size:14px;
+  font-weight:700;
+  font-family:inherit;
+  cursor:pointer;
+}
+.auth-submit:hover{ opacity:.9; }
+.auth-submit:disabled{ opacity:.6; cursor:not-allowed; }
+.auth-toggle{
+  text-align:center;
+  margin-top:18px;
+  font-size:13px;
+  color:var(--paper-dim);
+}
+.auth-toggle button{
+  background:none;
+  border:none;
+  color:var(--accent);
+  font-family:inherit;
+  font-size:13px;
+  font-weight:600;
+  cursor:pointer;
+  margin-left:4px;
+}
+.user-badge{
+  font-size:12px;
+  color:var(--paper-dim);
+  margin-right:8px;
+  white-space:nowrap;
+}
+</style>
+</head>
+<body>
+
+<!-- ===================== AUTH SCREEN ===================== -->
+<div id="authScreen" class="auth-screen">
+  <div class="auth-card">
+    <div class="brand" style="justify-content:center;margin-bottom:22px;">
+      <div class="brand-mark"></div>
+      <div class="brand-text">
+        <div class="t1">AUDIT BENCH</div>
+        <div class="t2">sign in to continue</div>
+      </div>
+    </div>
+
+    <div id="authError" class="auth-error" style="display:none;"></div>
+    <div id="authNotice" class="auth-notice" style="display:none;"></div>
+
+    <button id="googleLoginBtn" class="google-btn" type="button">
+      <svg width="18" height="18" viewBox="0 0 18 18" xmlns="http://www.w3.org/2000/svg"><path fill="#4285F4" d="M17.64 9.2c0-.64-.06-1.25-.16-1.84H9v3.48h4.84a4.14 4.14 0 0 1-1.8 2.72v2.26h2.9c1.7-1.57 2.7-3.88 2.7-6.62z"/><path fill="#34A853" d="M9 18c2.43 0 4.47-.8 5.96-2.18l-2.9-2.26c-.8.54-1.84.86-3.06.86-2.35 0-4.34-1.59-5.05-3.72H.96v2.33A9 9 0 0 0 9 18z"/><path fill="#FBBC05" d="M3.95 10.7A5.4 5.4 0 0 1 3.67 9c0-.59.1-1.17.28-1.7V4.97H.96A9 9 0 0 0 0 9c0 1.45.35 2.83.96 4.03l2.99-2.33z"/><path fill="#EA4335" d="M9 3.58c1.32 0 2.5.45 3.44 1.35l2.58-2.58C13.46.89 11.43 0 9 0A9 9 0 0 0 .96 4.97l2.99 2.33C4.66 5.17 6.65 3.58 9 3.58z"/></svg>
+      Continue with Google
+    </button>
+
+    <div class="auth-divider"><span>or</span></div>
+
+    <form id="authForm">
+      <label class="auth-label" for="authEmail">Email</label>
+      <input type="email" id="authEmail" class="auth-input" required autocomplete="email">
+      <label class="auth-label" for="authPassword">Password</label>
+      <input type="password" id="authPassword" class="auth-input" required autocomplete="current-password" minlength="6">
+
+      <button type="submit" id="authSubmitBtn" class="auth-submit">Log in</button>
+    </form>
+
+    <div class="auth-toggle">
+      <span id="authToggleText">Don't have an account?</span>
+      <button id="authToggleBtn" type="button">Sign up</button>
+    </div>
+  </div>
+</div>
+
+<!-- ===================== MAIN APP (hidden until logged in) ===================== -->
+<div id="appContent" style="display:none;">
+
+<header>
+  <div class="header-inner">
+    <div class="brand">
+      <div class="brand-mark"></div>
+      <div class="brand-text">
+        <div class="t1">AUDIT BENCH</div>
+        <div class="t2">static review / owasp top 10</div>
+      </div>
+    </div>
+    <nav>
+      <div>10 <span>categories tracked</span></div>
+      <div>Client-side <span>· nothing leaves your browser</span></div>
+    </nav>
+    <div id="userBadge" class="user-badge"></div>
+    <button class="theme-btn" id="logoutBtn" style="margin-right:8px;">Log out</button>
+    <button class="theme-btn" id="themeToggle">
+      <span class="swatch-dot" id="swatchDot"></span> Theme colors
+    </button>
+  </div>
+</header>
+
+<div class="theme-panel" id="themePanel">
+  <div class="theme-panel-inner">
+    <div class="theme-panel-head">
+      <div class="label">Recolor the whole site</div>
+      <button class="theme-close" id="themeClose">✕</button>
+    </div>
+
+    <div class="custom-pickers">
+      <div class="picker-group">
+        <label>Accent</label>
+        <input type="color" id="pickAccent" value="#e8483a">
+      </div>
+      <div class="picker-group">
+        <label>Background</label>
+        <input type="color" id="pickBg" value="#11141b">
+      </div>
+      <div class="picker-group">
+        <label>Panel</label>
+        <input type="color" id="pickPanel" value="#181c26">
+      </div>
+      <div class="picker-group">
+        <label>Text</label>
+        <input type="color" id="pickText" value="#e9e7e0">
+      </div>
+      <button class="reset-theme-btn" id="resetTheme">Reset to default</button>
+    </div>
+
+    <div class="palette-count" id="paletteCount">Loading full color list…</div>
+    <div class="palette-scroll">
+      <div class="palette-grid" id="paletteGrid"></div>
+    </div>
+  </div>
+</div>
+
+<section class="hero">
+  <div class="hero-tag">Case open — awaiting evidence</div>
+  <h1>Paste code. Get a <em>redlined</em> vulnerability report.</h1>
+  <p class="hero-sub">
+    Audit Bench reads a snippet of your app — backend route, frontend handler, query, config —
+    and flags patterns that map to the OWASP Top 10, line by line, with a rewritten fix for each one.
+    No live target is touched; this reviews the code you give it, not a URL.
+  </p>
+  <div class="owasp-strip">
+    <div class="owasp-chip">A01 Broken Access Control</div>
+    <div class="owasp-chip">A02 Cryptographic Failures</div>
+    <div class="owasp-chip">A03 Injection</div>
+    <div class="owasp-chip">A04 Insecure Design</div>
+    <div class="owasp-chip">A05 Security Misconfiguration</div>
+    <div class="owasp-chip">A06 Vulnerable Components</div>
+    <div class="owasp-chip">A07 Auth Failures</div>
+    <div class="owasp-chip">A08 Integrity Failures</div>
+    <div class="owasp-chip">A09 Logging Failures</div>
+    <div class="owasp-chip">A10 SSRF</div>
+  </div>
+</section>
+
+<section class="bench">
+  <div class="grid">
+
+    <!-- INPUT PANEL -->
+    <div class="panel">
+      <div class="panel-head">
+        <div class="label">Exhibit A — submitted code</div>
+        <select id="langSelect">
+          <option value="auto">Auto-detect</option>
+          <option value="js">JavaScript / Node</option>
+          <option value="py">Python</option>
+          <option value="php">PHP</option>
+          <option value="sql">SQL</option>
+          <option value="html">HTML</option>
+          <option value="config">Config / env</option>
+        </select>
+      </div>
+      <div class="url-row">
+        <input type="text" id="urlInput" placeholder="Or fetch source from a URL / domain — e.g. https://example.com or example.com">
+        <button class="fetch-btn" id="fetchBtn">Fetch source</button>
+        <div class="url-status" id="urlStatus"></div>
+      </div>
+      <div class="url-row">
+        <input type="file" id="zipInput" accept=".zip" style="display:none">
+        <button class="fetch-btn" id="zipBtn" type="button">Upload ZIP of project</button>
+        <div class="url-status" id="zipStatus"></div>
+      </div>
+      <textarea id="codeInput" placeholder="// Paste a route handler, a query, a config file, a component — anything.
+// Example:
+app.get('/user', (req, res) =&gt; {
+  const q = &quot;SELECT * FROM users WHERE id = &quot; + req.query.id;
+  db.query(q, (err, r) =&gt; res.send(r));
+});"></textarea>
+      <div class="actions">
+        <button class="sample-btn" id="sampleBtn">Load sample with 6 known issues</button>
+        <button class="scan-btn" id="scanBtn">
+          <span>▶</span> Run audit
+        </button>
+      </div>
+    </div>
+
+    <!-- REPORT PANEL -->
+    <div class="panel">
+      <div class="panel-head">
+        <div class="label" id="reportLabel">Exhibit B — findings</div>
+        <div class="dots"><span></span><span></span><span></span></div>
+      </div>
+      <div class="report-body" id="reportBody">
+        <div class="report-empty">
+          <div class="glyph mono">◌</div>
+          <div class="mono">No audit run yet. Paste code on the left and press&nbsp;Run&nbsp;audit.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ANNOTATED CODE (signature element) -->
+  <div class="panel annotated-wrap-container" id="annotatedContainer" style="display:none; margin-top:20px;">
+    <div class="annotated-head">Exhibit C — annotated source (● critical &nbsp; ● medium &nbsp; ● low)</div>
+    <div style="overflow-x:auto;">
+      <table class="code-table" id="codeTable"></table>
+    </div>
+  </div>
+</section>
+
+<footer>
+  AUDIT BENCH — heuristic static analysis, not a substitute for a professional pentest or SAST/DAST pipeline. Nothing you paste is transmitted anywhere; all scanning runs in this browser tab.
+</footer>
+
+</div><!-- /#appContent -->
+
+<script>
+// ---------------------------------------------------------------
+// Detection rules. Each rule: id (OWASP category), title, severity,
+// regex (tested per-line), explain, fix (template string).
+// ---------------------------------------------------------------
+const RULES = [
+  {
+    owasp: "A03:2021", cat:"Injection", sev:"critical",
+    title:"SQL query built with string concatenation",
+    re:/(SELECT|INSERT|UPDATE|DELETE)[^"'`]*["'`][\s\S]{0,40}?["'`]\s*\+|["'`]\s*\+\s*(req\.|request\.|params|query|input)/i,
+    explain:"User-controlled input is concatenated directly into a SQL string. An attacker can break out of the intended query and read, modify, or delete arbitrary data (classic SQL injection).",
+    bad:`const q = "SELECT * FROM users WHERE id = " + req.query.id;\ndb.query(q, cb);`,
+    good:`const q = "SELECT * FROM users WHERE id = ?";\ndb.query(q, [req.query.id], cb);\n// or use an ORM / query builder with parameter binding`
+  },
+  {
+    owasp:"A03:2021", cat:"Injection", sev:"critical",
+    title:"f-string / .format() used to build a SQL statement",
+    re:/(execute|cursor\.execute)\s*\(\s*f["']|(execute)\s*\(\s*["'][^"']*\{[^}]*\}[^"']*["']\s*\.\s*format/i,
+    explain:"Python's f-strings or .format() inline user data straight into SQL text, bypassing parameter binding and enabling SQL injection.",
+    bad:`cursor.execute(f"SELECT * FROM users WHERE name = '{name}'")`,
+    good:`cursor.execute("SELECT * FROM users WHERE name = %s", (name,))\n# psycopg2/mysql-connector style — always bind parameters, never format SQL text`
+  },
+  {
+    owasp:"A03:2021", cat:"Injection", sev:"critical",
+    title:"innerHTML / dangerouslySetInnerHTML set from unsanitized input",
+    re:/(innerHTML|outerHTML)\s*=\s*(?!["'`]\s*["'`])|dangerouslySetInnerHTML\s*=\s*\{\{\s*__html:\s*(?!DOMPurify)/i,
+    explain:"Writing untrusted data into the DOM via innerHTML lets an attacker inject a <script> or event handler — stored/reflected XSS — which can steal session cookies or hijack the page.",
+    bad:`el.innerHTML = comment.text;`,
+    good:`el.textContent = comment.text;\n// or sanitize first:\nimport DOMPurify from 'dompurify';\nel.innerHTML = DOMPurify.sanitize(comment.text);`
+  },
+  {
+    owasp:"A03:2021", cat:"Injection", sev:"critical",
+    title:"Shell command built from user input",
+    re:/(child_process|exec|execSync|os\.system|subprocess\.(call|run|Popen))\s*\([^)]*\+|shell\s*=\s*True[\s\S]{0,80}(req\.|input\(|params)/i,
+    explain:"Passing user-controlled data into a shell command (via string concatenation or shell=True) allows command injection — an attacker can chain in arbitrary OS commands.",
+    bad:`exec("ping " + req.body.host);`,
+    good:`const { execFile } = require('child_process');\nexecFile('ping', ['-c', '1', host], cb);\n// pass args as an array, never build a shell string`
+  },
+  {
+    owasp:"A02:2021", cat:"Cryptographic Failures", sev:"critical",
+    title:"Password hashed with MD5 or SHA1",
+    re:/(md5|sha1)\s*\(\s*(password|pwd|pass)/i,
+    explain:"MD5/SHA1 are fast, unsalted hashes designed for checksums, not passwords — they're crackable at billions of guesses per second on commodity GPUs.",
+    bad:`const hash = crypto.createHash('md5').update(password).digest('hex');`,
+    good:`const bcrypt = require('bcrypt');\nconst hash = await bcrypt.hash(password, 12);\n// or argon2 / scrypt — slow, salted, purpose-built for passwords`
+  },
+  {
+    owasp:"A02:2021", cat:"Cryptographic Failures", sev:"medium",
+    title:"Hardcoded secret, API key, or credential",
+    re:/(api[_-]?key|secret|password|token)\s*[:=]\s*["'][A-Za-z0-9\-_\/+=]{8,}["']/i,
+    explain:"A credential is committed directly in source. Anyone with repo access (or a leaked build artifact) gets the key — and rotating it means another code deploy.",
+    bad:`const apiKey = "sk_live_51H8x9aKq2mZ...";`,
+    good:`const apiKey = process.env.API_KEY;\n// load from environment / secret manager (Vault, AWS Secrets Manager, etc.), never commit it`
+  },
+  {
+    owasp:"A05:2021", cat:"Security Misconfiguration", sev:"medium",
+    title:"CORS wildcard on a route that reflects credentials",
+    re:/Access-Control-Allow-Origin['"]?\s*[:,]\s*["']\*["']/i,
+    explain:"Allowing every origin (\"*\") for a credentialed endpoint lets any website make authenticated requests on a logged-in user's behalf, defeating same-origin protections.",
+    bad:`res.setHeader('Access-Control-Allow-Origin', '*');`,
+    good:`const allowed = ['https://app.yourdomain.com'];\nif (allowed.includes(origin)) res.setHeader('Access-Control-Allow-Origin', origin);\nres.setHeader('Vary', 'Origin');`
+  },
+  {
+    owasp:"A05:2021", cat:"Security Misconfiguration", sev:"medium",
+    title:"Debug / stack traces enabled in what looks like production code",
+    re:/(debug\s*[:=]\s*True|app\.debug\s*=\s*true|NODE_ENV[^=]*=\s*['"]development['"])/i,
+    explain:"Debug mode surfaces stack traces, environment variables, and internals in error responses — a roadmap for attackers if it ships to production.",
+    bad:`app.run(debug=True)`,
+    good:`app.run(debug=os.environ.get("FLASK_DEBUG") == "1")\n// gate debug behind an explicit env flag that's unset in prod`
+  },
+  {
+    owasp:"A07:2021", cat:"Identification & Authentication Failures", sev:"medium",
+    title:"Session/JWT secret is a short, guessable literal",
+    re:/(jwt\.sign|JWT_SECRET|session\s*\(\s*\{[^}]*secret)[\s\S]{0,40}["'](secret|changeme|password|1234|test)["']/i,
+    explain:"A weak, predictable signing secret lets an attacker forge valid session tokens or JWTs and impersonate any user.",
+    bad:`jwt.sign(payload, "secret");`,
+    good:`jwt.sign(payload, process.env.JWT_SECRET, { algorithm: 'HS256', expiresIn: '15m' });\n// generate with: crypto.randomBytes(48).toString('hex'), store in a secret manager`
+  },
+  {
+    owasp:"A01:2021", cat:"Broken Access Control", sev:"critical",
+    title:"Object fetched by ID with no ownership/authorization check",
+    re:/findById\(\s*req\.(params|query|body)\.[a-zA-Z_]+\s*\)\s*;?\s*$|SELECT \* FROM \w+ WHERE id\s*=\s*\?\s*["'`]?\s*\)?\s*;?\s*$/i,
+    explain:"The record is looked up purely by an ID supplied in the request, with no check that the current user is allowed to see it — a classic Insecure Direct Object Reference (IDOR).",
+    bad:`const invoice = await Invoice.findById(req.params.id);\nres.json(invoice);`,
+    good:`const invoice = await Invoice.findById(req.params.id);\nif (!invoice || invoice.ownerId !== req.user.id) return res.status(404).end();\nres.json(invoice);`
+  },
+  {
+    owasp:"A08:2021", cat:"Software & Data Integrity Failures", sev:"critical",
+    title:"eval() / Function() executing dynamic or remote content",
+    re:/\beval\s*\(|new\s+Function\s*\(|pickle\.loads\s*\(/i,
+    explain:"eval / Function() (or Python's pickle.loads on untrusted bytes) executes arbitrary code contained in a string — if that string ever includes attacker-influenced data, it's full remote code execution.",
+    bad:`const result = eval(userExpression);`,
+    good:`import { evaluate } from 'mathjs';\nconst result = evaluate(userExpression);\n// use a sandboxed expression parser instead of eval; never unpickle untrusted bytes`
+  },
+  {
+    owasp:"A10:2021", cat:"Server-Side Request Forgery", sev:"critical",
+    title:"Outbound request built from a user-supplied URL",
+    re:/(fetch|axios\.get|requests\.get|urllib\.request\.urlopen|http\.get)\s*\(\s*(req\.|request\.|params|body\.url|query\.url)/i,
+    explain:"The server fetches a URL taken directly from user input. An attacker can point it at internal services, cloud metadata endpoints (e.g. 169.254.169.254), or bypass firewalls — SSRF.",
+    bad:`const r = await axios.get(req.body.url);`,
+    good:`const { hostname } = new URL(req.body.url);\nif (!ALLOWLIST.includes(hostname)) return res.status(400).end();\nconst r = await axios.get(req.body.url, { timeout: 3000 });\n// resolve DNS and block private/link-local IP ranges before fetching`
+  },
+  {
+    owasp:"A09:2021", cat:"Security Logging & Monitoring Failures", sev:"low",
+    title:"Sensitive data written to logs",
+    re:/console\.log\([^)]*(password|token|ssn|credit ?card)[^)]*\)|print\([^)]*(password|token|ssn)[^)]*\)/i,
+    explain:"Logging raw credentials or tokens leaks them into log aggregators, crash reporters, and anyone with log access — turning a routine debug line into a data exposure.",
+    bad:`console.log("login attempt", { email, password });`,
+    good:`console.log("login attempt", { email });\n// never log secrets; if you must debug, log a hash or a boolean, not the raw value`
+  },
+  {
+    owasp:"A02:2021", cat:"Cryptographic Failures", sev:"low",
+    title:"Math.random() used to generate a token or reset code",
+    re:/(Math\.random\(\))[\s\S]{0,60}(token|reset|otp|session)|resetToken\s*=\s*Math\.random/i,
+    explain:"Math.random() is not cryptographically secure — its output is predictable enough that an attacker can guess or reconstruct password-reset tokens or session IDs.",
+    bad:`const resetToken = Math.random().toString(36).slice(2);`,
+    good:`const crypto = require('crypto');\nconst resetToken = crypto.randomBytes(32).toString('hex');`
+  },
+  {
+    owasp:"A01:2021", cat:"Broken Access Control", sev:"medium",
+    title:"Path built from user input passed to a file-system read",
+    re:/(fs\.readFile|fs\.createReadStream|open\()\s*\(\s*[^)]*\+\s*(req\.|request\.|params|query)/i,
+    explain:"A filename or path segment from the request is concatenated directly into a filesystem read. Without normalization, '../../' sequences let an attacker read files outside the intended directory (path traversal).",
+    bad:`fs.readFile('./uploads/' + req.query.file, cb);`,
+    good:`const path = require('path');\nconst safe = path.normalize(req.query.file).replace(/^(\\.\\.[\\/\\\\])+/, '');\nconst full = path.join(UPLOAD_DIR, safe);\nif (!full.startsWith(UPLOAD_DIR)) return res.status(400).end();\nfs.readFile(full, cb);`
+  },
+];
+
+let lastFindings = [];
+let lastLines = [];
+
+document.getElementById('scanBtn').addEventListener('click', runAudit);
+document.getElementById('sampleBtn').addEventListener('click', loadSample);
+
+function loadSample(){
+  document.getElementById('codeInput').value =
+`app.get('/api/invoice', (req, res) => {
+  const q = "SELECT * FROM invoices WHERE id = " + req.query.id;
+  db.query(q, (err, rows) => res.send(rows));
+});
+
+app.post('/api/reset', (req, res) => {
+  const resetToken = Math.random().toString(36).slice(2);
+  console.log("reset requested", { email: req.body.email, password: req.body.password });
+  res.json({ token: resetToken });
+});
+
+const apiKey = "sk_live_51H8x9aKq2mZUexample";
+
+app.get('/preview', async (req, res) => {
+  const r = await axios.get(req.query.url);
+  res.send(r.data);
+});
+
+res.setHeader('Access-Control-Allow-Origin', '*');
+
+document.getElementById('bio').innerHTML = user.bio;`;
+  runAudit();
+}
+
+function detectLang(code){
+  if(/<\?php/.test(code)) return 'php';
+  if(/def |import |print\(/.test(code) && /:$/m.test(code)) return 'py';
+  if(/SELECT|INSERT INTO|UPDATE .* SET/i.test(code) && !/function|const|let/.test(code)) return 'sql';
+  if(/<html|<div|<script/i.test(code)) return 'html';
+  return 'js';
+}
+
+function escapeHtml(s){
+  return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
+
+// ---------------------------------------------------------------
+// Self-scan guard — when the pasted/loaded text is Audit Bench's own
+// source, the RULES array's bad:/good: example strings and the
+// loadSample() demo string are string-literal documentation, not
+// executable app logic. Without this they self-match and flood the
+// report with noise. Detect that case and skip just those line
+// ranges (everything else in the file is still scanned normally).
+// ---------------------------------------------------------------
+function computeExcludedLines(lines){
+  const excluded = new Set();
+  const looksLikeSelf = lines.some(l => l.includes('const RULES = [')) &&
+                         lines.some(l => l.includes('function runAudit('));
+  if(!looksLikeSelf) return excluded;
+
+  // Exclude each individual rule-definition line (bad:, good:, title:,
+  // explain:, re: — these are metadata/sample fields, not live code)
+  // rather than trying to bracket-match the whole array, so a real
+  // vulnerability elsewhere in a similar-looking file still gets caught.
+  const fieldLine = /^\s*(bad|good|title|explain|re)\s*:/;
+  lines.forEach((line, idx) => {
+    if(fieldLine.test(line)) excluded.add(idx);
+  });
+
+  // Exclude the loadSample() demo string: from the assignment line
+  // through the closing "`;" of that template literal.
+  const sampleStart = lines.findIndex(l => l.includes("codeInput').value ="));
+  if(sampleStart !== -1){
+    let end = sampleStart;
+    for(let i = sampleStart + 1; i < lines.length; i++){
+      end = i;
+      if(lines[i].trim() === '`;') break;
+    }
+    for(let i = sampleStart; i <= end; i++) excluded.add(i);
+  }
+
+  return excluded;
+}
+
+function runAudit(){
+  const code = document.getElementById('codeInput').value;
+  const btn = document.getElementById('scanBtn');
+  const reportBody = document.getElementById('reportBody');
+  const reportLabel = document.getElementById('reportLabel');
+  const annotatedContainer = document.getElementById('annotatedContainer');
+
+  if(!code.trim()){
+    reportBody.innerHTML = `<div class="report-empty"><div class="glyph mono">!</div><div class="mono">Paste some code first — nothing to audit yet.</div></div>`;
+    annotatedContainer.style.display = 'none';
+    return;
+  }
+
+  btn.disabled = true;
+  btn.innerHTML = '<span>◌</span> Scanning…';
+
+  setTimeout(() => {
+    const lines = code.split('\n');
+    lastLines = lines;
+    const findings = [];
+    const excludedLines = computeExcludedLines(lines);
+
+    lines.forEach((line, idx) => {
+      if(excludedLines.has(idx)) return;
+      if(/\/\/\s*audit-ignore\b/i.test(line)) return; // manually reviewed & marked safe
+      RULES.forEach(rule => {
+        if(rule.re.test(line)){
+          findings.push({
+            ...rule,
+            lineNo: idx + 1,
+            lineText: line.trim()
+          });
+        }
+      });
+    });
+
+    // also test whole-code patterns that might span differently (dedupe by title+line)
+    const seen = new Set();
+    lastFindings = findings.filter(f => {
+      const key = f.title + f.lineNo;
+      if(seen.has(key)) return false;
+      seen.add(key);
+      return true;
+    });
+
+    renderReport(lastFindings, excludedLines.size);
+    renderAnnotated(lines, lastFindings);
+
+    btn.disabled = false;
+    btn.innerHTML = '<span>▶</span> Run audit';
+    reportLabel.textContent = `Exhibit B — ${lastFindings.length} finding${lastFindings.length===1?'':'s'}`;
+  }, 450);
+}
+
+function renderReport(findings, excludedCount){
+  const reportBody = document.getElementById('reportBody');
+  const selfScanNote = excludedCount > 0
+    ? `<div class="mono" style="font-size:12px;color:var(--paper-dim);margin-bottom:10px;">Detected this looks like Audit Bench's own source — skipped ${excludedCount} line${excludedCount===1?'':'s'} of rule-definition/sample data that would otherwise self-match.</div>`
+    : '';
+
+  if(findings.length === 0){
+    reportBody.innerHTML = `
+      ${selfScanNote}
+      <div class="report-empty">
+        <div class="glyph mono" style="color:var(--clear);">✓</div>
+        <div class="mono">No patterns from the OWASP Top 10 heuristics matched. That's a good sign — but this is a pattern scan, not a full audit.</div>
+      </div>`;
+    document.getElementById('annotatedContainer').style.display = 'none';
+    return;
+  }
+
+  const crit = findings.filter(f=>f.sev==='critical').length;
+  const med = findings.filter(f=>f.sev==='medium').length;
+  const low = findings.filter(f=>f.sev==='low').length;
+
+  let html = `
+    ${selfScanNote}
+    <div class="summary-bar">
+      <div class="sum-cell crit"><div class="n">${crit}</div><div class="l">Critical</div></div>
+      <div class="sum-cell med"><div class="n">${med}</div><div class="l">Medium</div></div>
+      <div class="sum-cell low"><div class="n">${low}</div><div class="l">Low</div></div>
+      <div class="sum-cell clean"><div class="n">${findings.length}</div><div class="l">Total</div></div>
+    </div>
+  `;
+
+  findings
+    .sort((a,b) => ({critical:0,medium:1,low:2}[a.sev]) - ({critical:0,medium:1,low:2}[b.sev]))
+    .forEach((f, i) => {
+      html += `
+        <div class="finding" id="finding-${i}">
+          <div class="finding-head" onclick="toggleFinding(${i})">
+            <span class="sev-tag sev-${f.sev}">${f.sev}</span>
+            <div style="flex:1;">
+              <div class="finding-title">${escapeHtml(f.title)}</div>
+              <div class="finding-meta">${f.owasp} · ${escapeHtml(f.cat)} · line ${f.lineNo}</div>
+            </div>
+          </div>
+          <div class="finding-body">
+            <p>${escapeHtml(f.explain)}</p>
+            <div class="fix-label bad">✗ found on line ${f.lineNo}</div>
+            <div class="code-line bad">${escapeHtml(f.lineText)}</div>
+            <div class="fix-label good">✓ suggested fix</div>
+            <div class="code-line good">${escapeHtml(f.good)}</div>
+          </div>
+        </div>
+      `;
+    });
+
+  document.getElementById('reportBody').innerHTML = html; // audit-ignore: html built entirely from escapeHtml()-wrapped values above
+  document.getElementById('annotatedContainer').style.display = 'block';
+  // auto-open first finding
+  const first = document.getElementById('finding-0');
+  if(first) first.classList.add('open');
+}
+
+function toggleFinding(i){
+  document.getElementById('finding-'+i).classList.toggle('open');
+}
+
+function renderAnnotated(lines, findings){
+  const byLine = {};
+  findings.forEach(f => {
+    if(!byLine[f.lineNo] || sevRank(f.sev) < sevRank(byLine[f.lineNo])) byLine[f.lineNo] = f.sev;
+  });
+
+  let html = '';
+  lines.forEach((line, idx) => {
+    const ln = idx + 1;
+    const sev = byLine[ln];
+    const rowClass = sev ? `flag-${sev}` : '';
+    const dotColor = sev === 'critical' ? 'var(--alarm)' : sev === 'medium' ? 'var(--caution)' : sev === 'low' ? 'var(--info)' : 'transparent';
+    html += `<tr class="${rowClass}">
+      <td class="ln">${ln}</td>
+      <td class="gutter"><span class="m" style="background:${dotColor}"></span></td>
+      <td class="src">${escapeHtml(line) || ' '}</td>
+    </tr>`;
+  });
+  document.getElementById('codeTable').innerHTML = html; // audit-ignore: html built from escapeHtml()-wrapped source lines
+}
+
+function sevRank(s){ return {critical:0, medium:1, low:2}[s]; }
+
+// ---------------------------------------------------------------
+// Theme customizer — recolor the whole site, hidden behind a toggle.
+// Palette = all 148 CSS named colors (the full named-color spec) plus
+// arbitrary hex pickers, which cover the other 16.7 million.
+// ---------------------------------------------------------------
+const CSS_COLORS = ["aliceblue","antiquewhite","aqua","aquamarine","azure","beige","bisque","black","blanchedalmond","blue","blueviolet","brown","burlywood","cadetblue","chartreuse","chocolate","coral","cornflowerblue","cornsilk","crimson","cyan","darkblue","darkcyan","darkgoldenrod","darkgray","darkgreen","darkgrey","darkkhaki","darkmagenta","darkolivegreen","darkorange","darkorchid","darkred","darksalmon","darkseagreen","darkslateblue","darkslategray","darkslategrey","darkturquoise","darkviolet","deeppink","deepskyblue","dimgray","dimgrey","dodgerblue","firebrick","floralwhite","forestgreen","fuchsia","gainsboro","ghostwhite","gold","goldenrod","gray","green","greenyellow","grey","honeydew","hotpink","indianred","indigo","ivory","khaki","lavender","lavenderblush","lawngreen","lemonchiffon","lightblue","lightcoral","lightcyan","lightgoldenrodyellow","lightgray","lightgreen","lightgrey","lightpink","lightsalmon","lightseagreen","lightskyblue","lightslategray","lightslategrey","lightsteelblue","lightyellow","lime","limegreen","linen","magenta","maroon","mediumaquamarine","mediumblue","mediumorchid","mediumpurple","mediumseagreen","mediumslateblue","mediumspringgreen","mediumturquoise","mediumvioletred","midnightblue","mintcream","mistyrose","moccasin","navajowhite","navy","oldlace","olive","olivedrab","orange","orangered","orchid","palegoldenrod","palegreen","paleturquoise","palevioletred","papayawhip","peachpuff","peru","pink","plum","powderblue","purple","rebeccapurple","red","rosybrown","royalblue","saddlebrown","salmon","sandybrown","seagreen","seashell","sienna","silver","skyblue","slateblue","slategray","slategrey","snow","springgreen","steelblue","tan","teal","thistle","tomato","turquoise","violet","wheat","white","whitesmoke","yellow","yellowgreen"];
+
+function buildPalette(){
+  const grid = document.getElementById('paletteGrid');
+  document.getElementById('paletteCount').textContent = `${CSS_COLORS.length} named colors — click any to set as the accent. Use the pickers above for the other 16.7 million.`;
+  grid.innerHTML = CSS_COLORS.map(name => // audit-ignore: name comes from hardcoded CSS_COLORS array, not user input
+    `<div class="palette-swatch" style="background:${name}" data-name="${name}" onclick="applyTheme({accent:'${name}'})"></div>`
+  ).join('');
+}
+
+function applyTheme({accent, bg, panel, text} = {}){
+  const root = document.documentElement.style;
+  if(accent){
+    root.setProperty('--alarm', accent);
+    root.setProperty('--alarm-dim', shade(accent, -0.75));
+    document.getElementById('pickAccent').value = toHex(accent);
+    document.getElementById('swatchDot').style.background = accent;
+  }
+  if(bg){
+    root.setProperty('--ink', bg);
+  }
+  if(panel){
+    root.setProperty('--panel', panel);
+    root.setProperty('--panel-2', shade(panel, 0.12));
+  }
+  if(text){
+    root.setProperty('--paper', text);
+  }
+}
+
+// crude hex helpers so named-color clicks can still drive the dim/shade variants
+function toHex(color){
+  const d = document.createElement('div');
+  d.style.color = color;
+  document.body.appendChild(d);
+  const rgb = getComputedStyle(d).color.match(/\d+/g).map(Number);
+  document.body.removeChild(d);
+  return '#' + rgb.slice(0,3).map(v => v.toString(16).padStart(2,'0')).join('');
+}
+function shade(color, amt){
+  const hex = color.startsWith('#') ? color : toHex(color);
+  const num = parseInt(hex.slice(1), 16);
+  let r = (num >> 16) + Math.round(255*amt);
+  let g = ((num >> 8) & 0xff) + Math.round(255*amt);
+  let b = (num & 0xff) + Math.round(255*amt);
+  r = Math.min(255, Math.max(0, r));
+  g = Math.min(255, Math.max(0, g));
+  b = Math.min(255, Math.max(0, b));
+  return '#' + [r,g,b].map(v => v.toString(16).padStart(2,'0')).join('');
+}
+
+document.getElementById('themeToggle').addEventListener('click', () => {
+  document.getElementById('themePanel').classList.toggle('open');
+});
+document.getElementById('themeClose').addEventListener('click', () => {
+  document.getElementById('themePanel').classList.remove('open');
+});
+document.getElementById('pickAccent').addEventListener('input', e => applyTheme({accent:e.target.value}));
+document.getElementById('pickBg').addEventListener('input', e => applyTheme({bg:e.target.value}));
+document.getElementById('pickPanel').addEventListener('input', e => applyTheme({panel:e.target.value}));
+document.getElementById('pickText').addEventListener('input', e => applyTheme({text:e.target.value}));
+document.getElementById('resetTheme').addEventListener('click', () => {
+  applyTheme({accent:'#e8483a', bg:'#11141b', panel:'#181c26', text:'#e9e7e0'});
+});
+
+buildPalette();
+
+// ---------------------------------------------------------------
+// URL / domain fetch — tries to pull raw source for a link so it can
+// be dropped straight into the audit. Cross-origin pages will usually
+// block this via CORS (browsers can't bypass that, on purpose — this
+// tool never tries to route around it); if it's blocked, view-source
+// or "Save Page As" and paste the HTML in manually instead.
+// ---------------------------------------------------------------
+function normalizeUrl(raw){
+  let u = raw.trim();
+  if(!u) return null;
+  if(!/^https?:\/\//i.test(u)) u = 'https://' + u;
+  try{ return new URL(u).toString(); } catch(e){ return null; }
+}
+
+document.getElementById('fetchBtn').addEventListener('click', async () => {
+  const status = document.getElementById('urlStatus');
+  const raw = document.getElementById('urlInput').value;
+  const url = normalizeUrl(raw);
+  const btn = document.getElementById('fetchBtn');
+
+  status.classList.remove('err','ok');
+  status.classList.add('show');
+
+  if(!url){
+    status.textContent = 'Enter a valid URL or domain first (e.g. example.com).';
+    status.classList.add('err');
+    return;
+  }
+
+  btn.disabled = true;
+  btn.textContent = 'Fetching…';
+  status.textContent = `Requesting ${url} …`;
+
+  try{
+    const res = await fetch(url, { mode: 'cors' });
+    const html = await res.text();
+    document.getElementById('codeInput').value = html;
+    status.textContent = `Pulled ${html.length.toLocaleString()} characters from ${url}. Review the markup below, then Run audit.`;
+    status.classList.add('ok');
+  } catch(err){
+    status.textContent = `Couldn't fetch ${url} directly — most sites block cross-origin requests from a browser tab (CORS), which this tool respects rather than tries to bypass. Open the page, use "View Page Source," and paste the HTML into the box instead.`;
+    status.classList.add('err');
+  } finally{
+    btn.disabled = false;
+    btn.textContent = 'Fetch source';
+  }
+});
+
+// ---------------------------------------------------------------
+// ZIP upload — lets you audit a whole project instead of one file.
+// Unzips in the browser (JSZip), pulls every text/source file that
+// looks auditable, concatenates them (each prefixed with a header
+// comment naming the path) into the code box, then runs the same
+// line-by-line regex rules across the lot. Skips binaries, assets,
+// node_modules/vendor dirs, and anything oversized.
+// ---------------------------------------------------------------
+const ZIP_SKIP_DIRS = /(^|\/)(node_modules|vendor|\.git|dist|build|\.next|__pycache__|venv|\.venv)\//i;
+const ZIP_EXTS = /\.(js|jsx|ts|tsx|mjs|cjs|py|php|rb|go|java|kt|cs|sql|html|htm|vue|svelte|json|ya?ml|env|config|conf|ini|toml|sh)$/i;
+const ZIP_MAX_FILE_BYTES = 400 * 1024;
+const ZIP_MAX_TOTAL_FILES = 800;
+
+document.getElementById('zipBtn').addEventListener('click', () => {
+  document.getElementById('zipInput').click();
+});
+
+document.getElementById('zipInput').addEventListener('change', async (e) => {
+  const file = e.target.files[0];
+  const status = document.getElementById('zipStatus');
+  const btn = document.getElementById('zipBtn');
+  status.classList.remove('err','ok');
+  status.classList.add('show');
+
+  if(!file) return;
+
+  if(typeof JSZip === 'undefined'){
+    status.textContent = 'ZIP support failed to load (blocked script?). Try again or paste code manually.';
+    status.classList.add('err');
+    return;
+  }
+
+  btn.disabled = true;
+  btn.textContent = 'Unzipping…';
+  status.textContent = `Reading ${file.name} …`;
+
+  try{
+    const zip = await JSZip.loadAsync(file);
+    const entries = Object.values(zip.files).filter(f =>
+      !f.dir && ZIP_EXTS.test(f.name) && !ZIP_SKIP_DIRS.test(f.name)
+    );
+
+    if(entries.length === 0){
+      status.textContent = `No auditable source files found in ${file.name} (checked for .js/.ts/.py/.php/.rb/.go/.java/.sql/.html/.env/etc — skipped node_modules/vendor/dist).`;
+      status.classList.add('err');
+      return;
+    }
+
+    const capped = entries.slice(0, ZIP_MAX_TOTAL_FILES);
+    const chunks = [];
+    let skippedBig = 0, totalChars = 0;
+
+    for(const entry of capped){
+      const buf = await entry.async('uint8array');
+      if(buf.byteLength > ZIP_MAX_FILE_BYTES){ skippedBig++; continue; }
+      let text;
+      try{ text = new TextDecoder('utf-8', { fatal: true }).decode(buf); }
+      catch(e){ continue; } // binary, skip
+      totalChars += text.length;
+      chunks.push(`// ==== ${entry.name} ====\n${text}`);
+    }
+
+    if(chunks.length === 0){
+      status.textContent = `Found ${entries.length} candidate file(s) in ${file.name} but none were readable as text (too large or binary).`;
+      status.classList.add('err');
+      return;
+    }
+
+    document.getElementById('codeInput').value = chunks.join('\n\n');
+
+    let msg = `Loaded ${chunks.length} file(s) (${totalChars.toLocaleString()} characters) from ${file.name}.`;
+    if(entries.length > capped.length) msg += ` Capped at ${ZIP_MAX_TOTAL_FILES} files, ${entries.length - capped.length} skipped.`;
+    if(skippedBig) msg += ` ${skippedBig} file(s) skipped for size (>${Math.round(ZIP_MAX_FILE_BYTES/1024)}KB).`;
+    msg += ' Running audit…';
+    status.textContent = msg;
+    status.classList.add('ok');
+
+    runAudit();
+  } catch(err){
+    status.textContent = `Couldn't read ${file.name} as a ZIP — make sure it's a valid .zip archive.`;
+    status.classList.add('err');
+  } finally{
+    btn.disabled = false;
+    btn.textContent = 'Upload ZIP of project';
+    e.target.value = '';
+  }
+});
+</script>
+
+<!-- ===================== AUTH LOGIC (Supabase) ===================== -->
+<script>
+// ---------------------------------------------------------------
+// Fill these in with your own Supabase project's values:
+// Dashboard → Project Settings → API
+// ---------------------------------------------------------------
+const SUPABASE_URL = 'https://yocpmmizqnatdgekuvrp.supabase.co';       // e.g. https://xxxxxxx.supabase.co
+const SUPABASE_ANON_KEY = 'sb_publishable_7Kbovagkw_tDbNhjqJD5EQ_A6Vqa774';
+
+const sb = (SUPABASE_URL.startsWith('http'))
+  ? supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY)
+  : null;
+
+const authScreen = document.getElementById('authScreen');
+const appContent = document.getElementById('appContent');
+const authForm = document.getElementById('authForm');
+const authEmail = document.getElementById('authEmail');
+const authPassword = document.getElementById('authPassword');
+const authSubmitBtn = document.getElementById('authSubmitBtn');
+const authError = document.getElementById('authError');
+const authNotice = document.getElementById('authNotice');
+const authToggleBtn = document.getElementById('authToggleBtn');
+const authToggleText = document.getElementById('authToggleText');
+const googleLoginBtn = document.getElementById('googleLoginBtn');
+const logoutBtn = document.getElementById('logoutBtn');
+const userBadge = document.getElementById('userBadge');
+
+let mode = 'login'; // 'login' | 'signup'
+
+function showAuthError(msg){
+  authNotice.style.display = 'none';
+  authError.textContent = msg;
+  authError.style.display = 'block';
+}
+function showAuthNotice(msg){
+  authError.style.display = 'none';
+  authNotice.textContent = msg;
+  authNotice.style.display = 'block';
+}
+function clearAuthMessages(){
+  authError.style.display = 'none';
+  authNotice.style.display = 'none';
+}
+
+authToggleBtn.addEventListener('click', () => {
+  mode = mode === 'login' ? 'signup' : 'login';
+  authSubmitBtn.textContent = mode === 'login' ? 'Log in' : 'Sign up';
+  authToggleText.textContent = mode === 'login' ? "Don't have an account?" : 'Already have an account?';
+  authToggleBtn.textContent = mode === 'login' ? 'Sign up' : 'Log in';
+  clearAuthMessages();
+});
+
+authForm.addEventListener('submit', async (e) => {
+  e.preventDefault();
+  if(!sb){
+    showAuthError('Auth isn\'t configured yet — set SUPABASE_URL and SUPABASE_ANON_KEY at the top of this script.');
+    return;
+  }
+  clearAuthMessages();
+  authSubmitBtn.disabled = true;
+  authSubmitBtn.textContent = mode === 'login' ? 'Logging in…' : 'Signing up…';
+
+  const email = authEmail.value.trim();
+  const password = authPassword.value;
+
+  try{
+    if(mode === 'login'){
+      const { error } = await sb.auth.signInWithPassword({ email, password });
+      if(error) throw error;
+      // onAuthStateChange below handles showing the app
+    } else {
+      const { error } = await sb.auth.signUp({ email, password });
+      if(error) throw error;
+      showAuthNotice('Check your inbox to confirm your email, then log in.');
+      mode = 'login';
+      authSubmitBtn.textContent = 'Log in';
+      authToggleText.textContent = "Don't have an account?";
+      authToggleBtn.textContent = 'Sign up';
+    }
+  } catch(err){
+    showAuthError(err.message || 'Something went wrong. Try again.');
+  } finally{
+    authSubmitBtn.disabled = false;
+    if(authSubmitBtn.textContent.includes('…')){
+      authSubmitBtn.textContent = mode === 'login' ? 'Log in' : 'Sign up';
+    }
+  }
+});
+
+googleLoginBtn.addEventListener('click', async () => {
+  if(!sb){
+    showAuthError('Auth isn\'t configured yet — set SUPABASE_URL and SUPABASE_ANON_KEY at the top of this script.');
+    return;
+  }
+  clearAuthMessages();
+  const { error } = await sb.auth.signInWithOAuth({
+    provider: 'google',
+    options: { redirectTo: window.location.href }
+  });
+  if(error) showAuthError(error.message);
+});
+
+logoutBtn.addEventListener('click', async () => {
+  if(!sb) return;
+  await sb.auth.signOut();
+});
+
+function setLoggedIn(user){
+  authScreen.style.display = 'none';
+  appContent.style.display = '';
+  userBadge.textContent = user.email || '';
+}
+function setLoggedOut(){
+  appContent.style.display = 'none';
+  authScreen.style.display = 'flex';
+  authEmail.value = '';
+  authPassword.value = '';
+  clearAuthMessages();
+}
+
+if(sb){
+  sb.auth.onAuthStateChange((_event, session) => {
+    if(session && session.user) setLoggedIn(session.user);
+    else setLoggedOut();
+  });
+  // Initial check in case onAuthStateChange doesn't fire immediately
+  sb.auth.getSession().then(({ data }) => {
+    if(data.session && data.session.user) setLoggedIn(data.session.user);
+    else setLoggedOut();
+  });
+} else {
+  // Not configured yet — show the auth screen with a clear message
+  // instead of silently locking people out with no explanation.
+  showAuthError('Auth isn\'t configured yet — set SUPABASE_URL and SUPABASE_ANON_KEY at the top of the last script block in this file.');
+}
+</script>
+
+</body>
+</html>
