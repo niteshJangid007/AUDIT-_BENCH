@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>About — Audit Bench</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --ink:#11141b;
+    --panel:#181c26;
+    --panel-2:#1f2430;
+    --line:#2a2f3d;
+    --paper:#e9e7e0;
+    --paper-dim:#9aa0ae;
+    --alarm:#e8483a;
+    --alarm-dim:#3a1f1e;
+    --caution:#e8a23a;
+    --caution-dim:#3a301c;
+    --clear:#3fbf9f;
+    --clear-dim:#1a332c;
+    --info:#5b8def;
+    --info-dim:#1c2740;
+  }
+  *{box-sizing:border-box; margin:0; padding:0;}
+  html,body{background:var(--ink); color:var(--paper); font-family:'Inter',sans-serif; min-height:100vh;}
+  body{
+    background-image:
+      linear-gradient(var(--line) 1px, transparent 1px),
+      linear-gradient(90deg, var(--line) 1px, transparent 1px);
+    background-size: 64px 64px;
+    background-position: -1px -1px;
+    background-attachment: fixed;
+    background-color: var(--ink);
+  }
+  .mono{font-family:'JetBrains Mono', monospace;}
+  ::selection{background:var(--alarm); color:#fff;}
+
+  /* ===== Header ===== */
+  header{
+    border-bottom:1px solid var(--line);
+    background:rgba(17,20,27,0.85);
+    backdrop-filter: blur(6px);
+    position:sticky; top:0; z-index:50;
+  }
+  .header-inner{
+    max-width:900px; margin:0 auto; padding:18px 28px;
+    display:flex; align-items:center; justify-content:space-between; gap:24px;
+    flex-wrap:wrap;
+  }
+  .brand{display:flex; align-items:center; gap:12px;}
+  .brand-mark{
+    width:34px; height:34px; border-radius:4px;
+    background: repeating-linear-gradient(45deg, var(--alarm), var(--alarm) 4px, transparent 4px, transparent 8px);
+    border:1px solid var(--alarm);
+    position:relative;
+    flex-shrink:0;
+  }
+  .brand-mark::after{
+    content:"";
+    position:absolute; inset:5px;
+    background:var(--ink);
+  }
+  .brand-text .t1{font-family:'JetBrains Mono'; font-weight:800; font-size:15px; letter-spacing:0.5px;}
+  .brand-text .t2{font-size:11px; color:var(--paper-dim); letter-spacing:1.5px; text-transform:uppercase; font-family:'JetBrains Mono';}
+
+  .theme-btn{
+    font-family:'JetBrains Mono'; font-size:11px; letter-spacing:0.5px; color:var(--paper-dim);
+    background:none; border:1px solid var(--line); border-radius:5px; padding:8px 12px; cursor:pointer;
+    display:flex; align-items:center; gap:7px; text-decoration:none;
+  }
+  .theme-btn:hover{color:var(--paper); border-color:var(--paper-dim);}
+
+  /* ===== Content ===== */
+  main{
+    max-width:720px; margin:0 auto; padding:56px 28px 100px;
+  }
+  .page-tag{
+    font-family:'JetBrains Mono'; font-size:11px; letter-spacing:2px; text-transform:uppercase;
+    color:var(--alarm); margin-bottom:18px;
+  }
+  h1{
+    font-family:'JetBrains Mono'; font-weight:800; font-size:clamp(28px,5vw,42px);
+    line-height:1.1; letter-spacing:-1px; margin-bottom:28px;
+  }
+  .panel{
+    background:var(--panel); border:1px solid var(--line); border-radius:8px; padding:28px 30px;
+  }
+  .panel p{ font-size:15px; line-height:1.7; color:#c7c5bd; margin-bottom:18px; }
+  .panel p:last-child{ margin-bottom:0; }
+  .panel strong{ color:var(--paper); }
+
+  .owasp-strip{
+    margin-top:28px; display:flex; flex-wrap:wrap; gap:8px;
+  }
+  .owasp-chip{
+    font-family:'JetBrains Mono'; font-size:10.5px; padding:6px 10px; border:1px solid var(--line);
+    border-radius:3px; color:var(--paper-dim); letter-spacing:0.3px;
+  }
+
+  .meta-line{
+    margin-top:26px; padding-top:20px; border-top:1px solid var(--line);
+    font-family:'JetBrains Mono'; font-size:11.5px; color:var(--paper-dim); letter-spacing:0.3px;
+  }
+  .meta-link{ color:var(--info); text-decoration:none; }
+  .meta-link:hover{ text-decoration:underline; }
+
+  footer{
+    border-top:1px solid var(--line); padding:26px 28px; text-align:center;
+    font-family:'JetBrains Mono'; font-size:11px; color:var(--paper-dim); letter-spacing:0.5px;
+  }
+
+  @media (max-width:640px){
+    .header-inner{ padding:14px 16px; }
+    main{ padding:36px 16px 70px; }
+    .panel{ padding:22px 20px; }
+    h1{ font-size:clamp(24px,7vw,32px); }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="header-inner">
+    <div class="brand">
+      <div class="brand-mark"></div>
+      <div class="brand-text">
+        <div class="t1">AUDIT BENCH</div>
+        <div class="t2">static review / owasp top 10</div>
+      </div>
+    </div>
+    <a class="theme-btn" href="index.html">← Back to app</a>
+  </div>
+</header>
+
+<main>
+  <div class="page-tag">● About</div>
+  <h1>What Audit Bench is — and isn't.</h1>
+
+  <div class="panel">
+    <p>Audit Bench is a client-side static code scanner. It reads a snippet of your app — a backend route, a frontend handler, a query, a config file — and flags patterns that map to the OWASP Top 10, line by line, with a suggested rewrite for each finding.</p>
+    <p>It works entirely in your browser. Nothing you paste, upload, or scan is ever sent to a server — there's no backend involved in the scanning itself, only in the login system that gates access to the tool.</p>
+    <p><strong>What it isn't:</strong> this is a heuristic pattern scan, not a full security audit, SAST/DAST pipeline, or penetration test. A clean scan doesn't mean your code is safe — it means it didn't match the specific patterns this tool checks for. Treat findings as a starting point for review, not a certificate.</p>
+    <p><strong>Coverage:</strong> Injection (SQL injection, XSS, command injection), broken access control, cryptographic failures, security misconfiguration, authentication failures, software & data integrity failures, logging & monitoring failures, and server-side request forgery — 10 categories aligned to the OWASP Top 10 (2021).</p>
+
+    <div class="owasp-strip">
+      <div class="owasp-chip">A01 Broken Access Control</div>
+      <div class="owasp-chip">A02 Cryptographic Failures</div>
+      <div class="owasp-chip">A03 Injection</div>
+      <div class="owasp-chip">A04 Insecure Design</div>
+      <div class="owasp-chip">A05 Security Misconfiguration</div>
+      <div class="owasp-chip">A06 Vulnerable Components</div>
+      <div class="owasp-chip">A07 Auth Failures</div>
+      <div class="owasp-chip">A08 Integrity Failures</div>
+      <div class="owasp-chip">A09 Logging Failures</div>
+      <div class="owasp-chip">A10 SSRF</div>
+    </div>
+
+    <div class="meta-line">
+      Built by Nitesh Jangid —
+      <a href="https://github.com/niteshjangid007" target="_blank" rel="noopener noreferrer" class="meta-link">GitHub</a>
+      ·
+      <a href="https://in.linkedin.com/in/nitesh-jangid-719645379" target="_blank" rel="noopener noreferrer" class="meta-link">LinkedIn</a>
+    </div>
+  </div>
+</main>
+
+<footer>
+  AUDIT BENCH — heuristic static analysis, not a substitute for a professional pentest or SAST/DAST pipeline.
+</footer>
+
+</body>
+</html>

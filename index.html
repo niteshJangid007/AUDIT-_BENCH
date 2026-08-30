@@ -68,6 +68,7 @@
   .brand-text .t2{font-size:11px; color:var(--paper-dim); letter-spacing:1.5px; text-transform:uppercase; font-family:'JetBrains Mono';}
   nav{display:flex; gap:28px; font-family:'JetBrains Mono'; font-size:12px; letter-spacing:0.5px; color:var(--paper-dim);}
   nav span{color:var(--clear);}
+  .header-actions{ display:flex; align-items:center; gap:8px; flex-shrink:0; }
 
   /* ===== Hero ===== */
   .hero{max-width:1280px; margin:0 auto; padding:64px 28px 40px;}
@@ -230,6 +231,7 @@
     font-family:'JetBrains Mono'; font-size:11px; letter-spacing:0.5px; color:var(--paper-dim);
     background:none; border:1px solid var(--line); border-radius:5px; padding:8px 12px; cursor:pointer;
     display:flex; align-items:center; gap:7px;
+    text-decoration:none; /* in case this class is used on an <a>, not just <button> */
   }
   .theme-btn:hover{color:var(--paper); border-color:var(--paper-dim);}
   .swatch-dot{width:10px; height:10px; border-radius:50%; background:var(--alarm); border:1px solid rgba(255,255,255,0.25);}
@@ -472,14 +474,23 @@
   border-top:1px solid var(--line);
   padding-top:14px;
 }
-.profile-avatar-dot{
-  display:inline-block;
-  width:8px;
-  height:8px;
+.header-avatar{
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  width:18px;
+  height:18px;
   border-radius:50%;
-  background:var(--accent);
-  margin-right:6px;
-  vertical-align:middle;
+  background:var(--panel-2);
+  border:1px solid var(--line);
+  color:var(--accent);
+  font-size:9px;
+  font-weight:700;
+  overflow:hidden;
+  flex-shrink:0;
+}
+.header-avatar img{
+  width:100%; height:100%; object-fit:cover;
 }
 .profile-row{
   display:flex;
@@ -551,10 +562,11 @@
     gap:10px 8px;
   }
   .brand{ order:1; }
-  #aboutBtn, #profileBtn, #themeToggle{ order:2; margin-right:0 !important; }
+  .header-actions{ order:2; gap:6px; }
   nav{ order:3; width:100%; gap:16px; flex-wrap:wrap; font-size:11px; }
   .theme-btn{ padding:7px 9px; font-size:10.5px; }
-  .theme-btn .user-badge{ display:none; } /* avatar dot only on small screens, full name in profile modal */
+  #profileBtn .user-badge{ display:none; } /* avatar circle only on small screens; full name is in the profile modal */
+  #profileBtn{ padding:7px 8px; }
 
   h1{ font-size:clamp(26px,7vw,38px); }
   .hero-sub{ font-size:14.5px; }
@@ -590,6 +602,7 @@
   .owasp-strip{ gap:6px; }
   .sum-cell{ padding:10px 8px; }
   .sum-cell .n{ font-size:18px; }
+  #themeToggle{ font-size:0; padding:7px 8px; gap:0; }
 }
 </style>
 </head>
@@ -648,33 +661,18 @@
       <div>10 <span>categories tracked</span></div>
       <div>Client-side <span>· nothing leaves your browser</span></div>
     </nav>
-    <button class="theme-btn" id="aboutBtn" style="margin-right:8px;">About</button>
-    <button class="theme-btn" id="profileBtn" style="margin-right:8px;">
-      <span id="profileAvatar" class="profile-avatar-dot"></span>
-      <span id="userBadge" class="user-badge"></span>
-    </button>
-    <button class="theme-btn" id="themeToggle">
-      <span class="swatch-dot" id="swatchDot"></span> Theme colors
-    </button>
+    <div class="header-actions">
+      <a class="theme-btn" href="about.html">About</a>
+      <button class="theme-btn" id="profileBtn">
+        <span id="profileAvatar" class="header-avatar"></span>
+        <span id="userBadge" class="user-badge"></span>
+      </button>
+      <button class="theme-btn" id="themeToggle">
+        <span class="swatch-dot" id="swatchDot"></span> Theme colors
+      </button>
+    </div>
   </div>
 </header>
-
-<!-- ===================== ABOUT MODAL ===================== -->
-<div class="modal-overlay" id="aboutModal">
-  <div class="modal-card">
-    <div class="theme-panel-head">
-      <div class="label">About Audit Bench</div>
-      <button class="theme-close" id="aboutClose">✕</button>
-    </div>
-    <div class="modal-body">
-      <p>Audit Bench is a client-side static code scanner that reads a snippet of your app — a backend route, a frontend handler, a query, a config file — and flags patterns that map to the OWASP Top 10, line by line, with a suggested rewrite for each finding.</p>
-      <p>It works entirely in your browser. Nothing you paste, upload, or scan is ever sent to a server — there's no backend involved in the scanning itself, only in the login system.</p>
-      <p><strong>What it isn't:</strong> this is a heuristic pattern scan, not a full security audit, SAST/DAST pipeline, or penetration test. A clean scan doesn't mean your code is safe — it means it didn't match the specific patterns this tool checks for. Treat findings as a starting point for review, not a certificate.</p>
-      <p><strong>Coverage:</strong> Injection (SQLi, XSS, command injection), broken access control, cryptographic failures, security misconfiguration, authentication failures, software integrity issues, logging failures, and SSRF — 10 categories aligned to the OWASP Top 10 (2021).</p>
-      <p class="modal-meta">Built by Nitesh Jangid.</p>
-    </div>
-  </div>
-</div>
 
 <!-- ===================== PROFILE MODAL ===================== -->
 <div class="modal-overlay" id="profileModal">
@@ -824,6 +822,11 @@ app.get('/user', (req, res) =&gt; {
 
 <footer>
   AUDIT BENCH — heuristic static analysis, not a substitute for a professional pentest or SAST/DAST pipeline. Nothing you paste is transmitted anywhere; all scanning runs in this browser tab.
+  <div style="margin-top:10px;">
+    <a href="https://github.com/niteshjangid007" target="_blank" rel="noopener noreferrer" style="color:var(--info); text-decoration:none;">GitHub</a>
+    ·
+    <a href="https://in.linkedin.com/in/nitesh-jangid-719645379" target="_blank" rel="noopener noreferrer" style="color:var(--info); text-decoration:none;">LinkedIn</a>
+  </div>
 </footer>
 
 </div><!-- /#appContent -->
@@ -1415,10 +1418,7 @@ const authToggleText = document.getElementById('authToggleText');
 const googleLoginBtn = document.getElementById('googleLoginBtn');
 const userBadge = document.getElementById('userBadge');
 
-// About / profile modal wiring
-const aboutBtn = document.getElementById('aboutBtn');
-const aboutModal = document.getElementById('aboutModal');
-const aboutClose = document.getElementById('aboutClose');
+// Profile modal wiring
 const profileBtn = document.getElementById('profileBtn');
 const profileModal = document.getElementById('profileModal');
 const profileClose = document.getElementById('profileClose');
@@ -1429,10 +1429,6 @@ const profileName = document.getElementById('profileName');
 const profileEmail = document.getElementById('profileEmail');
 const profileProvider = document.getElementById('profileProvider');
 const profileCreated = document.getElementById('profileCreated');
-
-aboutBtn.addEventListener('click', () => aboutModal.classList.add('open'));
-aboutClose.addEventListener('click', () => aboutModal.classList.remove('open'));
-aboutModal.addEventListener('click', (e) => { if(e.target === aboutModal) aboutModal.classList.remove('open'); });
 
 profileBtn.addEventListener('click', () => profileModal.classList.add('open'));
 profileClose.addEventListener('click', () => profileModal.classList.remove('open'));
@@ -1544,12 +1540,24 @@ function setLoggedIn(user){
 
   userBadge.textContent = name || user.email || '';
 
+  const profileAvatarEl = document.getElementById('profileAvatar');
+  profileAvatarEl.textContent = '';
+  const isSafeHttpsUrl = (u) => { try{ return new URL(u).protocol === 'https:'; } catch(e){ return false; } };
+  if(avatarUrl && isSafeHttpsUrl(avatarUrl)){
+    const img = document.createElement('img');
+    img.src = avatarUrl;
+    img.alt = '';
+    profileAvatarEl.appendChild(img);
+  } else {
+    profileAvatarEl.textContent = initials(name, user.email);
+  }
+
   profileName.textContent = name || (user.email ? user.email.split('@')[0] : 'Account');
   profileEmail.textContent = user.email || '—';
   profileProvider.textContent = provider === 'google' ? 'Google' : 'Email & password';
   profileCreated.textContent = created;
 
-  if(avatarUrl){
+  if(avatarUrl && isSafeHttpsUrl(avatarUrl)){
     profileAvatarImg.src = avatarUrl;
     profileAvatarImg.style.display = 'block';
     profileAvatarFallback.style.display = 'none';
@@ -1565,7 +1573,6 @@ function setLoggedOut(){
   authEmail.value = '';
   authPassword.value = '';
   clearAuthMessages();
-  aboutModal.classList.remove('open');
   profileModal.classList.remove('open');
 }
 
