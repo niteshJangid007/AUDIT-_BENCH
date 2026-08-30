@@ -531,6 +531,66 @@
 }
 .profile-meta span:first-child{ color:var(--paper-dim); }
 .profile-meta span:last-child{ color:var(--paper); font-weight:600; }
+
+/* ===================== Mobile / tablet ===================== */
+@media (max-width:900px){
+  .header-inner{ padding:14px 16px; gap:14px; flex-wrap:wrap; }
+  .hero{ padding:40px 16px 28px; }
+  .bench{ padding:16px 16px 70px; }
+  .theme-panel{ padding:0 16px 20px; }
+  section > .header-inner,
+  .owasp-strip{ padding:0; }
+}
+
+@media (max-width:640px){
+  .header-inner{
+    display:flex;
+    flex-wrap:wrap;
+    align-items:center;
+    justify-content:space-between;
+    gap:10px 8px;
+  }
+  .brand{ order:1; }
+  #aboutBtn, #profileBtn, #themeToggle{ order:2; margin-right:0 !important; }
+  nav{ order:3; width:100%; gap:16px; flex-wrap:wrap; font-size:11px; }
+  .theme-btn{ padding:7px 9px; font-size:10.5px; }
+  .theme-btn .user-badge{ display:none; } /* avatar dot only on small screens, full name in profile modal */
+
+  h1{ font-size:clamp(26px,7vw,38px); }
+  .hero-sub{ font-size:14.5px; }
+  .owasp-strip{ margin-top:24px; }
+  .owasp-chip{ font-size:10px; padding:5px 8px; }
+
+  .actions{ flex-wrap:wrap; }
+  .sample-btn{ flex:1 1 100%; order:2; text-align:center; }
+  .scan-btn{ flex:1 1 100%; order:1; justify-content:center; }
+
+  .summary-bar{ flex-wrap:wrap; }
+  .sum-cell{ flex:1 1 50%; border-right:none; border-bottom:1px solid var(--line); }
+  .sum-cell:nth-child(2n){ border-right:none; }
+
+  textarea{ min-height:280px; font-size:13.5px; padding:14px; }
+
+  .finding-head{ padding:14px; gap:10px; }
+  .finding-title{ font-size:13.5px; }
+  .finding-body{ padding:0 14px 16px 14px; }
+
+  .auth-card, .modal-card{ padding:22px 18px; max-width:100%; }
+  .auth-screen{ padding:16px; }
+
+  .panel-head{ padding:12px 14px; }
+  .url-row{ padding:12px 14px; }
+}
+
+@media (max-width:420px){
+  .brand-text .t1{ font-size:13px; }
+  .brand-text .t2{ font-size:9.5px; }
+  .brand-mark{ width:28px; height:28px; }
+  nav{ font-size:10px; gap:10px; }
+  .owasp-strip{ gap:6px; }
+  .sum-cell{ padding:10px 8px; }
+  .sum-cell .n{ font-size:18px; }
+}
 </style>
 </head>
 <body>
