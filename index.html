@@ -72,6 +72,9 @@
 
   /* ===== Hero ===== */
   .hero{max-width:1280px; margin:0 auto; padding:64px 28px 40px;}
+  .hero-grid{
+    display:grid; grid-template-columns: 1.15fr 0.85fr; gap:40px; align-items:center;
+  }
   .hero-tag{
     font-family:'JetBrains Mono'; font-size:11px; letter-spacing:2px; text-transform:uppercase;
     color:var(--alarm); display:flex; align-items:center; gap:10px; margin-bottom:22px;
@@ -92,6 +95,65 @@
   .owasp-chip{
     font-family:'JetBrains Mono'; font-size:10.5px; padding:6px 10px; border:1px solid var(--line);
     border-radius:3px; color:var(--paper-dim); letter-spacing:0.3px;
+  }
+
+  /* ===== Hero visual — animated wireframe orb ===== */
+  .hero-visual{
+    position:relative; height:400px; display:flex; align-items:center; justify-content:center;
+  }
+  .orb-core{
+    position:relative; width:230px; height:230px;
+    transform-style:preserve-3d;
+    animation: orb-spin 16s linear infinite;
+  }
+  .orb-ring{
+    position:absolute; inset:0; border-radius:50%;
+    border:1.5px solid color-mix(in srgb, var(--alarm) 55%, transparent);
+    box-shadow: 0 0 24px color-mix(in srgb, var(--alarm) 35%, transparent) inset,
+                0 0 40px color-mix(in srgb, var(--alarm) 20%, transparent);
+  }
+  .orb-ring:nth-child(1){ transform: rotateY(0deg); }
+  .orb-ring:nth-child(2){ transform: rotateY(60deg); }
+  .orb-ring:nth-child(3){ transform: rotateY(120deg); }
+  .orb-ring:nth-child(4){ transform: rotateX(90deg); }
+  .orb-glow{
+    position:absolute; inset:38px; border-radius:50%;
+    background: radial-gradient(circle at 40% 35%, color-mix(in srgb, var(--alarm) 65%, transparent), transparent 70%);
+    filter: blur(6px);
+    animation: orb-pulse 3.2s ease-in-out infinite;
+  }
+  @keyframes orb-spin{
+    0%{ transform: rotateX(15deg) rotateY(0deg); }
+    100%{ transform: rotateX(15deg) rotateY(360deg); }
+  }
+  @keyframes orb-pulse{
+    0%,100%{ opacity:0.55; transform:scale(0.94); }
+    50%{ opacity:0.95; transform:scale(1.04); }
+  }
+  .orbit-badge{
+    position:absolute; display:flex; align-items:center; justify-content:center;
+    font-family:'JetBrains Mono'; font-size:10px; font-weight:700; letter-spacing:0.3px;
+    width:56px; height:56px; border-radius:50%;
+    background:var(--panel); border:1px solid var(--line); color:var(--paper);
+    box-shadow: 0 6px 18px rgba(0,0,0,0.4);
+    animation: badge-float 5s ease-in-out infinite;
+  }
+  .orbit-badge.b1{ top:6%; left:2%; animation-delay:0s; }
+  .orbit-badge.b2{ bottom:12%; left:-4%; animation-delay:1.2s; }
+  .orbit-badge.b3{ top:2%; right:0%; animation-delay:0.6s; }
+  .orbit-badge.b4{ bottom:4%; right:6%; animation-delay:1.8s; }
+  @keyframes badge-float{
+    0%,100%{ transform:translateY(0); }
+    50%{ transform:translateY(-10px); }
+  }
+  @media (prefers-reduced-motion: reduce){
+    .orb-core, .orb-glow, .orbit-badge{ animation:none; }
+  }
+  @media (max-width:980px){
+    .hero-grid{ grid-template-columns:1fr; }
+    .hero-visual{ height:260px; order:-1; margin-bottom:8px; }
+    .orb-core{ width:160px; height:160px; }
+    .orbit-badge{ width:44px; height:44px; font-size:8.5px; }
   }
 
   /* ===== Main workbench ===== */
@@ -734,24 +796,42 @@
 </div>
 
 <section class="hero">
-  <div class="hero-tag">Case open — awaiting evidence</div>
-  <h1>Paste code. Get a <em>redlined</em> vulnerability report.</h1>
-  <p class="hero-sub">
-    Audit Bench reads a snippet of your app — backend route, frontend handler, query, config —
-    and flags patterns that map to the OWASP Top 10, line by line, with a rewritten fix for each one.
-    No live target is touched; this reviews the code you give it, not a URL.
-  </p>
-  <div class="owasp-strip">
-    <div class="owasp-chip">A01 Broken Access Control</div>
-    <div class="owasp-chip">A02 Cryptographic Failures</div>
-    <div class="owasp-chip">A03 Injection</div>
-    <div class="owasp-chip">A04 Insecure Design</div>
-    <div class="owasp-chip">A05 Security Misconfiguration</div>
-    <div class="owasp-chip">A06 Vulnerable Components</div>
-    <div class="owasp-chip">A07 Auth Failures</div>
-    <div class="owasp-chip">A08 Integrity Failures</div>
-    <div class="owasp-chip">A09 Logging Failures</div>
-    <div class="owasp-chip">A10 SSRF</div>
+  <div class="hero-grid">
+    <div class="hero-copy">
+      <div class="hero-tag">Case open — awaiting evidence</div>
+      <h1>Paste code. Get a <em>redlined</em> vulnerability report.</h1>
+      <p class="hero-sub">
+        Audit Bench reads a snippet of your app — backend route, frontend handler, query, config —
+        and flags patterns that map to the OWASP Top 10, line by line, with a rewritten fix for each one.
+        No live target is touched; this reviews the code you give it, not a URL.
+      </p>
+      <div class="owasp-strip">
+        <div class="owasp-chip">A01 Broken Access Control</div>
+        <div class="owasp-chip">A02 Cryptographic Failures</div>
+        <div class="owasp-chip">A03 Injection</div>
+        <div class="owasp-chip">A04 Insecure Design</div>
+        <div class="owasp-chip">A05 Security Misconfiguration</div>
+        <div class="owasp-chip">A06 Vulnerable Components</div>
+        <div class="owasp-chip">A07 Auth Failures</div>
+        <div class="owasp-chip">A08 Integrity Failures</div>
+        <div class="owasp-chip">A09 Logging Failures</div>
+        <div class="owasp-chip">A10 SSRF</div>
+      </div>
+    </div>
+
+    <div class="hero-visual" aria-hidden="true">
+      <div class="orb-core">
+        <div class="orb-ring"></div>
+        <div class="orb-ring"></div>
+        <div class="orb-ring"></div>
+        <div class="orb-ring"></div>
+        <div class="orb-glow"></div>
+      </div>
+      <div class="orbit-badge b1">XSS</div>
+      <div class="orbit-badge b2">SQLi</div>
+      <div class="orbit-badge b3">SSRF</div>
+      <div class="orbit-badge b4">RCE</div>
+    </div>
   </div>
 </section>
 
