@@ -605,6 +605,59 @@
 .profile-meta span:first-child{ color:var(--paper-dim); }
 .profile-meta span:last-child{ color:var(--paper); font-weight:600; }
 
+/* ===== Feature / Choose-us / FAQ sections ===== */
+.section-inner{ max-width:1080px; margin:0 auto; padding:70px 28px; }
+.section-tag{
+  font-family:'JetBrains Mono'; font-size:11px; letter-spacing:2px; text-transform:uppercase;
+  color:var(--alarm); margin-bottom:14px;
+}
+.section-title{
+  font-family:'JetBrains Mono'; font-weight:800; font-size:clamp(22px,3.4vw,32px);
+  line-height:1.2; letter-spacing:-0.5px; max-width:640px; margin-bottom:16px;
+}
+.section-sub{ color:var(--paper-dim); font-size:15px; line-height:1.6; max-width:560px; }
+
+.features{ border-top:1px solid var(--line); }
+.features-grid{
+  margin-top:36px; display:grid; grid-template-columns:repeat(3, 1fr); gap:1px;
+  background:var(--line); border:1px solid var(--line); border-radius:8px; overflow:hidden;
+}
+.feature-card{ background:var(--panel); padding:26px 24px; }
+.feature-num{ font-family:'JetBrains Mono'; font-size:12px; color:var(--alarm); margin-bottom:10px; }
+.feature-title{ font-family:'JetBrains Mono'; font-weight:700; font-size:14.5px; margin-bottom:8px; }
+.feature-desc{ font-size:13.5px; color:var(--paper-dim); line-height:1.55; }
+
+.choose-us{ border-top:1px solid var(--line); background:var(--panel); }
+.choose-us-grid{ display:grid; grid-template-columns:1.2fr 0.8fr; gap:48px; align-items:center; }
+.choose-us-list{ list-style:none; margin-top:22px; display:flex; flex-direction:column; gap:12px; }
+.choose-us-list li{
+  font-size:14px; color:var(--paper); padding-left:22px; position:relative; line-height:1.5;
+}
+.choose-us-list li::before{
+  content:"›"; position:absolute; left:0; color:var(--alarm); font-weight:700;
+}
+.choose-us-stats{ display:grid; grid-template-columns:1fr 1fr; gap:14px; }
+.stat-box{
+  background:var(--panel-2); border:1px solid var(--line); border-radius:8px; padding:22px 18px;
+  text-align:center;
+}
+.stat-n{ font-family:'JetBrains Mono'; font-weight:800; font-size:26px; color:var(--alarm); }
+.stat-l{ font-size:11.5px; color:var(--paper-dim); margin-top:6px; line-height:1.4; }
+
+.faq{ border-top:1px solid var(--line); }
+.faq-grid{ margin-top:32px; display:grid; grid-template-columns:1fr 1fr; gap:20px; }
+.faq-item{
+  background:var(--panel); border:1px solid var(--line); border-radius:6px; padding:16px 18px; margin-bottom:12px;
+}
+.faq-item summary{
+  cursor:pointer; font-family:'JetBrains Mono'; font-size:13.5px; font-weight:700; color:var(--paper);
+  list-style:none;
+}
+.faq-item summary::-webkit-details-marker{ display:none; }
+.faq-item summary::before{ content:"+ "; color:var(--alarm); }
+.faq-item[open] summary::before{ content:"– "; }
+.faq-item p{ margin-top:10px; font-size:13px; color:var(--paper-dim); line-height:1.6; }
+
 /* ===================== Mobile / tablet ===================== */
 @media (max-width:900px){
   .header-inner{ padding:14px 16px; gap:14px; flex-wrap:wrap; }
@@ -613,6 +666,10 @@
   .theme-panel{ padding:0 16px 20px; }
   section > .header-inner,
   .owasp-strip{ padding:0; }
+  .section-inner{ padding:48px 20px; }
+  .features-grid{ grid-template-columns:repeat(2, 1fr); }
+  .choose-us-grid{ grid-template-columns:1fr; gap:32px; }
+  .faq-grid{ grid-template-columns:1fr; }
 }
 
 @media (max-width:640px){
@@ -654,6 +711,11 @@
 
   .panel-head{ padding:12px 14px; }
   .url-row{ padding:12px 14px; }
+
+  .section-inner{ padding:36px 16px; }
+  .section-title{ font-size:clamp(20px,6vw,26px); }
+  .features-grid{ grid-template-columns:1fr; }
+  .choose-us-stats{ grid-template-columns:1fr 1fr; }
 }
 
 @media (max-width:420px){
@@ -896,6 +958,119 @@ app.get('/user', (req, res) =&gt; {
     <div class="annotated-head">Exhibit C — annotated source (● critical &nbsp; ● medium &nbsp; ● low)</div>
     <div style="overflow-x:auto;">
       <table class="code-table" id="codeTable"></table>
+    </div>
+  </div>
+</section>
+
+<section class="features">
+  <div class="section-inner">
+    <div class="section-tag">What you get</div>
+    <h2 class="section-title">Built for a quick, honest pass over your code</h2>
+    <div class="features-grid">
+      <div class="feature-card">
+        <div class="feature-num">01</div>
+        <div class="feature-title">Instant scanning</div>
+        <div class="feature-desc">Paste a snippet or a whole file and get findings in under a second — no queue, no upload wait.</div>
+      </div>
+      <div class="feature-card">
+        <div class="feature-num">02</div>
+        <div class="feature-title">Whole-project ZIP upload</div>
+        <div class="feature-desc">Drop in a zipped project and every source file gets scanned together, with findings mapped back to the right file and line.</div>
+      </div>
+      <div class="feature-card">
+        <div class="feature-num">03</div>
+        <div class="feature-title">Line-by-line fixes</div>
+        <div class="feature-desc">Every finding comes with the exact line, why it matters, and a rewritten version you can drop straight in.</div>
+      </div>
+      <div class="feature-card">
+        <div class="feature-num">04</div>
+        <div class="feature-title">Runs entirely in your browser</div>
+        <div class="feature-desc">Nothing you paste or upload is sent to a server. Scanning happens client-side, in this tab, every time.</div>
+      </div>
+      <div class="feature-card">
+        <div class="feature-num">05</div>
+        <div class="feature-title">OWASP Top 10 coverage</div>
+        <div class="feature-desc">Injection, broken access control, crypto failures, SSRF, and six more categories, all mapped to the current OWASP list.</div>
+      </div>
+      <div class="feature-card">
+        <div class="feature-num">06</div>
+        <div class="feature-title">Free, with an account</div>
+        <div class="feature-desc">Sign in with email or Google to use it. No pricing tiers, no card required.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="choose-us">
+  <div class="section-inner choose-us-grid">
+    <div class="choose-us-copy">
+      <div class="section-tag">Why Audit Bench</div>
+      <h2 class="section-title">A fast first pass, before your real review</h2>
+      <p class="section-sub">
+        Audit Bench isn't trying to replace a security team or a paid pentest — it's meant to catch the
+        obvious stuff early, in the minute between writing code and opening a pull request.
+      </p>
+      <ul class="choose-us-list">
+        <li>No install, no CLI, no CI pipeline to wire up</li>
+        <li>Nothing leaves your browser while scanning</li>
+        <li>Works on a single snippet or an entire zipped project</li>
+        <li>Every finding explains the risk, not just flags it</li>
+      </ul>
+    </div>
+    <div class="choose-us-stats">
+      <div class="stat-box">
+        <div class="stat-n">10</div>
+        <div class="stat-l">OWASP categories tracked</div>
+      </div>
+      <div class="stat-box">
+        <div class="stat-n">0</div>
+        <div class="stat-l">Servers your code touches</div>
+      </div>
+      <div class="stat-box">
+        <div class="stat-n">&lt;1s</div>
+        <div class="stat-l">Typical scan time</div>
+      </div>
+      <div class="stat-box">
+        <div class="stat-n">Free</div>
+        <div class="stat-l">No pricing tiers</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="faq">
+  <div class="section-inner">
+    <div class="section-tag">Questions</div>
+    <h2 class="section-title">Before you paste in your code</h2>
+    <div class="faq-grid">
+      <div class="faq-col">
+        <details class="faq-item" open>
+          <summary>Is this a real security audit?</summary>
+          <p>No. It's a heuristic pattern scan — it checks your code against known-risky patterns and tells you where they show up. A clean scan means nothing matched those patterns, not that your app is secure. Treat it as a fast first pass, not a certificate.</p>
+        </details>
+        <details class="faq-item">
+          <summary>Does my code get sent anywhere?</summary>
+          <p>No. Everything runs in your browser tab using JavaScript regex matching. Nothing you paste, fetch, or upload as a ZIP is transmitted to a server for scanning.</p>
+        </details>
+        <details class="faq-item">
+          <summary>Why do I need to log in to use it?</summary>
+          <p>The scanner itself needs no server, but the login gate uses Supabase to manage accounts (email/password or Google). Your account data lives in Supabase's database, separate from anything you scan.</p>
+        </details>
+      </div>
+      <div class="faq-col">
+        <details class="faq-item">
+          <summary>Can it scan a live website?</summary>
+          <p>Not directly — browsers block cross-origin fetches for security (CORS), so pasting a URL can only pull a page's source if that site allows it. For real coverage, paste the source directly or upload it as a ZIP.</p>
+        </details>
+        <details class="faq-item">
+          <summary>What languages does it cover?</summary>
+          <p>The pattern rules span JavaScript/TypeScript, Python, PHP, SQL, and general HTML — anywhere the OWASP Top 10 categories commonly show up in application code.</p>
+        </details>
+        <details class="faq-item">
+          <summary>What should I do after a finding shows up?</summary>
+          <p>Each finding includes the OWASP category, why it's risky, and a suggested rewrite. Use that as a starting point, then have it reviewed properly if the code handles anything sensitive.</p>
+        </details>
+      </div>
     </div>
   </div>
 </section>
