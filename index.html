@@ -379,395 +379,255 @@
   .url-status.err{color:var(--alarm);}
   .url-status.ok{color:var(--clear);}
 
-/* ===================== Auth screen ===================== */
-.auth-screen{
-  min-height:100vh;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  background:var(--ink);
-  padding:24px;
-}
-.auth-card{
-  width:100%;
-  max-width:380px;
-  background:var(--panel);
-  border:1px solid var(--line);
-  border-radius:10px;
-  padding:32px 28px;
-}
-.auth-error{
-  background:var(--alarm-dim);
-  color:var(--alarm);
-  border:1px solid var(--alarm);
-  border-radius:6px;
-  padding:10px 12px;
-  font-size:13px;
-  margin-bottom:16px;
-}
-.auth-notice{
-  background:var(--panel-2);
-  color:var(--paper);
-  border:1px solid var(--line);
-  border-radius:6px;
-  padding:10px 12px;
-  font-size:13px;
-  margin-bottom:16px;
-}
-.google-btn{
-  width:100%;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  gap:10px;
-  background:#fff;
-  color:#1f1f1f;
-  border:1px solid var(--line);
-  border-radius:6px;
-  padding:11px;
-  font-size:14px;
-  font-weight:600;
-  font-family:inherit;
-  cursor:pointer;
-}
-.google-btn:hover{ opacity:.9; }
-.auth-divider{
-  display:flex;
-  align-items:center;
-  gap:12px;
-  margin:20px 0;
-  color:var(--paper-dim);
-  font-size:12px;
-}
-.auth-divider::before,.auth-divider::after{
-  content:'';
-  flex:1;
-  height:1px;
-  background:var(--line);
-}
-.auth-label{
-  display:block;
-  font-size:12px;
-  color:var(--paper-dim);
-  margin:0 0 6px;
-}
-.auth-input{
-  width:100%;
-  background:var(--panel-2);
-  border:1px solid var(--line);
-  border-radius:6px;
-  padding:10px 12px;
-  color:var(--paper);
-  font-family:inherit;
-  font-size:14px;
-  margin-bottom:16px;
-}
-.auth-input:focus{ outline:none; border-color:var(--accent); }
-.auth-submit{
-  width:100%;
-  background:var(--accent);
-  color:#fff;
-  border:none;
-  border-radius:6px;
-  padding:11px;
-  font-size:14px;
-  font-weight:700;
-  font-family:inherit;
-  cursor:pointer;
-}
-.auth-submit:hover{ opacity:.9; }
-.auth-submit:disabled{ opacity:.6; cursor:not-allowed; }
-.auth-toggle{
-  text-align:center;
-  margin-top:18px;
-  font-size:13px;
-  color:var(--paper-dim);
-}
-.auth-toggle button{
-  background:none;
-  border:none;
-  color:var(--accent);
-  font-family:inherit;
-  font-size:13px;
-  font-weight:600;
-  cursor:pointer;
-  margin-left:4px;
-}
-.user-badge{
-  font-size:12px;
-  color:var(--paper-dim);
-  margin-right:8px;
-  white-space:nowrap;
-}
-
-/* ===================== About / Profile modals ===================== */
-.modal-overlay{
-  display:none;
-  position:fixed;
-  inset:0;
-  background:rgba(0,0,0,.55);
-  z-index:200;
-  align-items:center;
-  justify-content:center;
-  padding:20px;
-}
-.modal-overlay.open{ display:flex; }
-.modal-card{
-  width:100%;
-  max-width:440px;
-  max-height:80vh;
-  overflow-y:auto;
-  background:var(--panel);
-  border:1px solid var(--line);
-  border-radius:10px;
-  padding:22px 24px;
-}
-.modal-body{
-  margin-top:14px;
-  font-size:14px;
-  line-height:1.6;
-  color:var(--paper);
-}
-.modal-body p{ margin:0 0 14px; }
-.modal-meta{
-  font-size:12px;
-  color:var(--paper-dim);
-  margin-top:20px !important;
-  border-top:1px solid var(--line);
-  padding-top:14px;
-}
-.header-avatar{
-  display:inline-flex;
-  align-items:center;
-  justify-content:center;
-  width:18px;
-  height:18px;
-  border-radius:50%;
-  background:var(--panel-2);
-  border:1px solid var(--line);
-  color:var(--accent);
-  font-size:9px;
-  font-weight:700;
-  overflow:hidden;
-  flex-shrink:0;
-}
-.header-avatar img{
-  width:100%; height:100%; object-fit:cover;
-}
-.profile-row{
-  display:flex;
-  align-items:center;
-  gap:14px;
-}
-.profile-avatar-img{
-  width:52px;
-  height:52px;
-  border-radius:50%;
-  object-fit:cover;
-  border:1px solid var(--line);
-}
-.profile-avatar-fallback{
-  width:52px;
-  height:52px;
-  border-radius:50%;
-  background:var(--panel-2);
-  border:1px solid var(--line);
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  font-weight:700;
-  font-size:18px;
-  color:var(--accent);
-}
-.profile-name{
-  font-weight:700;
-  font-size:15px;
-  color:var(--paper);
-}
-.profile-email{
-  font-size:13px;
-  color:var(--paper-dim);
-  margin-top:2px;
-}
-.profile-meta{
-  margin-top:20px;
-  border-top:1px solid var(--line);
-  padding-top:16px;
-  display:flex;
-  flex-direction:column;
-  gap:10px;
-  font-size:13px;
-}
-.profile-meta div{
-  display:flex;
-  justify-content:space-between;
-}
-.profile-meta span:first-child{ color:var(--paper-dim); }
-.profile-meta span:last-child{ color:var(--paper); font-weight:600; }
-
-/* ===== Feature / Choose-us / FAQ sections ===== */
-.section-inner{ max-width:1080px; margin:0 auto; padding:70px 28px; }
-.section-tag{
-  font-family:'JetBrains Mono'; font-size:11px; letter-spacing:2px; text-transform:uppercase;
-  color:var(--alarm); margin-bottom:14px;
-}
-.section-title{
-  font-family:'JetBrains Mono'; font-weight:800; font-size:clamp(22px,3.4vw,32px);
-  line-height:1.2; letter-spacing:-0.5px; max-width:640px; margin-bottom:16px;
-}
-.section-sub{ color:var(--paper-dim); font-size:15px; line-height:1.6; max-width:560px; }
-
-.features{ border-top:1px solid var(--line); }
-.features-grid{
-  margin-top:36px; display:grid; grid-template-columns:repeat(3, 1fr); gap:1px;
-  background:var(--line); border:1px solid var(--line); border-radius:8px; overflow:hidden;
-}
-.feature-card{ background:var(--panel); padding:26px 24px; }
-.feature-num{ font-family:'JetBrains Mono'; font-size:12px; color:var(--alarm); margin-bottom:10px; }
-.feature-title{ font-family:'JetBrains Mono'; font-weight:700; font-size:14.5px; margin-bottom:8px; }
-.feature-desc{ font-size:13.5px; color:var(--paper-dim); line-height:1.55; }
-
-.choose-us{ border-top:1px solid var(--line); background:var(--panel); }
-.choose-us-grid{ display:grid; grid-template-columns:1.2fr 0.8fr; gap:48px; align-items:center; }
-.choose-us-list{ list-style:none; margin-top:22px; display:flex; flex-direction:column; gap:12px; }
-.choose-us-list li{
-  font-size:14px; color:var(--paper); padding-left:22px; position:relative; line-height:1.5;
-}
-.choose-us-list li::before{
-  content:"›"; position:absolute; left:0; color:var(--alarm); font-weight:700;
-}
-.choose-us-stats{ display:grid; grid-template-columns:1fr 1fr; gap:14px; }
-.stat-box{
-  background:var(--panel-2); border:1px solid var(--line); border-radius:8px; padding:22px 18px;
-  text-align:center;
-}
-.stat-n{ font-family:'JetBrains Mono'; font-weight:800; font-size:26px; color:var(--alarm); }
-.stat-l{ font-size:11.5px; color:var(--paper-dim); margin-top:6px; line-height:1.4; }
-
-.faq{ border-top:1px solid var(--line); }
-.faq-grid{ margin-top:32px; display:grid; grid-template-columns:1fr 1fr; gap:20px; }
-.faq-item{
-  background:var(--panel); border:1px solid var(--line); border-radius:6px; padding:16px 18px; margin-bottom:12px;
-}
-.faq-item summary{
-  cursor:pointer; font-family:'JetBrains Mono'; font-size:13.5px; font-weight:700; color:var(--paper);
-  list-style:none;
-}
-.faq-item summary::-webkit-details-marker{ display:none; }
-.faq-item summary::before{ content:"+ "; color:var(--alarm); }
-.faq-item[open] summary::before{ content:"– "; }
-.faq-item p{ margin-top:10px; font-size:13px; color:var(--paper-dim); line-height:1.6; }
-
-/* ===================== Mobile / tablet ===================== */
-@media (max-width:900px){
-  .header-inner{ padding:14px 16px; gap:14px; flex-wrap:wrap; }
-  .hero{ padding:40px 16px 28px; }
-  .bench{ padding:16px 16px 70px; }
-  .theme-panel{ padding:0 16px 20px; }
-  section > .header-inner,
-  .owasp-strip{ padding:0; }
-  .section-inner{ padding:48px 20px; }
-  .features-grid{ grid-template-columns:repeat(2, 1fr); }
-  .choose-us-grid{ grid-template-columns:1fr; gap:32px; }
-  .faq-grid{ grid-template-columns:1fr; }
-}
-
-@media (max-width:640px){
-  .header-inner{
+  /* ===================== Loading gate (while we check the session) ===================== */
+  .gate-screen{
+    min-height:100vh;
     display:flex;
-    flex-wrap:wrap;
     align-items:center;
-    justify-content:space-between;
-    gap:10px 8px;
+    justify-content:center;
+    background:var(--ink);
+    font-family:'JetBrains Mono', monospace;
+    font-size:13px;
+    color:var(--paper-dim);
+    letter-spacing:0.5px;
   }
-  .brand{ order:1; }
-  .header-actions{ order:2; gap:6px; }
-  nav{ order:3; width:100%; gap:16px; flex-wrap:wrap; font-size:11px; }
-  .theme-btn{ padding:7px 9px; font-size:10.5px; }
-  #profileBtn .user-badge{ display:none; } /* avatar circle only on small screens; full name is in the profile modal */
-  #profileBtn{ padding:7px 8px; }
 
-  h1{ font-size:clamp(26px,7vw,38px); }
-  .hero-sub{ font-size:14.5px; }
-  .owasp-strip{ margin-top:24px; }
-  .owasp-chip{ font-size:10px; padding:5px 8px; }
+  /* ===================== About / Profile modals ===================== */
+  .modal-overlay{
+    display:none;
+    position:fixed;
+    inset:0;
+    background:rgba(0,0,0,.55);
+    z-index:200;
+    align-items:center;
+    justify-content:center;
+    padding:20px;
+  }
+  .modal-overlay.open{ display:flex; }
+  .modal-card{
+    width:100%;
+    max-width:440px;
+    max-height:80vh;
+    overflow-y:auto;
+    background:var(--panel);
+    border:1px solid var(--line);
+    border-radius:10px;
+    padding:22px 24px;
+  }
+  .modal-body{
+    margin-top:14px;
+    font-size:14px;
+    line-height:1.6;
+    color:var(--paper);
+  }
+  .modal-body p{ margin:0 0 14px; }
+  .modal-meta{
+    font-size:12px;
+    color:var(--paper-dim);
+    margin-top:20px !important;
+    border-top:1px solid var(--line);
+    padding-top:14px;
+  }
+  .header-avatar{
+    display:inline-flex;
+    align-items:center;
+    justify-content:center;
+    width:18px;
+    height:18px;
+    border-radius:50%;
+    background:var(--panel-2);
+    border:1px solid var(--line);
+    color:var(--alarm);
+    font-size:9px;
+    font-weight:700;
+    overflow:hidden;
+    flex-shrink:0;
+  }
+  .header-avatar img{
+    width:100%; height:100%; object-fit:cover;
+  }
+  .profile-row{
+    display:flex;
+    align-items:center;
+    gap:14px;
+  }
+  .profile-avatar-img{
+    width:52px;
+    height:52px;
+    border-radius:50%;
+    object-fit:cover;
+    border:1px solid var(--line);
+  }
+  .profile-avatar-fallback{
+    width:52px;
+    height:52px;
+    border-radius:50%;
+    background:var(--panel-2);
+    border:1px solid var(--line);
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    font-weight:700;
+    font-size:18px;
+    color:var(--alarm);
+  }
+  .profile-name{
+    font-weight:700;
+    font-size:15px;
+    color:var(--paper);
+  }
+  .profile-email{
+    font-size:13px;
+    color:var(--paper-dim);
+    margin-top:2px;
+  }
+  .profile-meta{
+    margin-top:20px;
+    border-top:1px solid var(--line);
+    padding-top:16px;
+    display:flex;
+    flex-direction:column;
+    gap:10px;
+    font-size:13px;
+  }
+  .profile-meta div{
+    display:flex;
+    justify-content:space-between;
+  }
+  .profile-meta span:first-child{ color:var(--paper-dim); }
+  .profile-meta span:last-child{ color:var(--paper); font-weight:600; }
 
-  .actions{ flex-wrap:wrap; }
-  .sample-btn{ flex:1 1 100%; order:2; text-align:center; }
-  .scan-btn{ flex:1 1 100%; order:1; justify-content:center; }
+  /* ===== Feature / Choose-us / FAQ sections ===== */
+  .section-inner{ max-width:1080px; margin:0 auto; padding:70px 28px; }
+  .section-tag{
+    font-family:'JetBrains Mono'; font-size:11px; letter-spacing:2px; text-transform:uppercase;
+    color:var(--alarm); margin-bottom:14px;
+  }
+  .section-title{
+    font-family:'JetBrains Mono'; font-weight:800; font-size:clamp(22px,3.4vw,32px);
+    line-height:1.2; letter-spacing:-0.5px; max-width:640px; margin-bottom:16px;
+  }
+  .section-sub{ color:var(--paper-dim); font-size:15px; line-height:1.6; max-width:560px; }
 
-  .summary-bar{ flex-wrap:wrap; }
-  .sum-cell{ flex:1 1 50%; border-right:none; border-bottom:1px solid var(--line); }
-  .sum-cell:nth-child(2n){ border-right:none; }
+  .features{ border-top:1px solid var(--line); }
+  .features-grid{
+    margin-top:36px; display:grid; grid-template-columns:repeat(3, 1fr); gap:1px;
+    background:var(--line); border:1px solid var(--line); border-radius:8px; overflow:hidden;
+  }
+  .feature-card{ background:var(--panel); padding:26px 24px; }
+  .feature-num{ font-family:'JetBrains Mono'; font-size:12px; color:var(--alarm); margin-bottom:10px; }
+  .feature-title{ font-family:'JetBrains Mono'; font-weight:700; font-size:14.5px; margin-bottom:8px; }
+  .feature-desc{ font-size:13.5px; color:var(--paper-dim); line-height:1.55; }
 
-  textarea{ min-height:280px; font-size:13.5px; padding:14px; }
+  .choose-us{ border-top:1px solid var(--line); background:var(--panel); }
+  .choose-us-grid{ display:grid; grid-template-columns:1.2fr 0.8fr; gap:48px; align-items:center; }
+  .choose-us-list{ list-style:none; margin-top:22px; display:flex; flex-direction:column; gap:12px; }
+  .choose-us-list li{
+    font-size:14px; color:var(--paper); padding-left:22px; position:relative; line-height:1.5;
+  }
+  .choose-us-list li::before{
+    content:"›"; position:absolute; left:0; color:var(--alarm); font-weight:700;
+  }
+  .choose-us-stats{ display:grid; grid-template-columns:1fr 1fr; gap:14px; }
+  .stat-box{
+    background:var(--panel-2); border:1px solid var(--line); border-radius:8px; padding:22px 18px;
+    text-align:center;
+  }
+  .stat-n{ font-family:'JetBrains Mono'; font-weight:800; font-size:26px; color:var(--alarm); }
+  .stat-l{ font-size:11.5px; color:var(--paper-dim); margin-top:6px; line-height:1.4; }
 
-  .finding-head{ padding:14px; gap:10px; }
-  .finding-title{ font-size:13.5px; }
-  .finding-body{ padding:0 14px 16px 14px; }
+  .faq{ border-top:1px solid var(--line); }
+  .faq-grid{ margin-top:32px; display:grid; grid-template-columns:1fr 1fr; gap:20px; }
+  .faq-item{
+    background:var(--panel); border:1px solid var(--line); border-radius:6px; padding:16px 18px; margin-bottom:12px;
+  }
+  .faq-item summary{
+    cursor:pointer; font-family:'JetBrains Mono'; font-size:13.5px; font-weight:700; color:var(--paper);
+    list-style:none;
+  }
+  .faq-item summary::-webkit-details-marker{ display:none; }
+  .faq-item summary::before{ content:"+ "; color:var(--alarm); }
+  .faq-item[open] summary::before{ content:"– "; }
+  .faq-item p{ margin-top:10px; font-size:13px; color:var(--paper-dim); line-height:1.6; }
 
-  .auth-card, .modal-card{ padding:22px 18px; max-width:100%; }
-  .auth-screen{ padding:16px; }
+  /* ===================== Mobile / tablet ===================== */
+  @media (max-width:900px){
+    .header-inner{ padding:14px 16px; gap:14px; flex-wrap:wrap; }
+    .hero{ padding:40px 16px 28px; }
+    .bench{ padding:16px 16px 70px; }
+    .theme-panel{ padding:0 16px 20px; }
+    section > .header-inner,
+    .owasp-strip{ padding:0; }
+    .section-inner{ padding:48px 20px; }
+    .features-grid{ grid-template-columns:repeat(2, 1fr); }
+    .choose-us-grid{ grid-template-columns:1fr; gap:32px; }
+    .faq-grid{ grid-template-columns:1fr; }
+  }
 
-  .panel-head{ padding:12px 14px; }
-  .url-row{ padding:12px 14px; }
+  @media (max-width:640px){
+    .header-inner{
+      display:flex;
+      flex-wrap:wrap;
+      align-items:center;
+      justify-content:space-between;
+      gap:10px 8px;
+    }
+    .brand{ order:1; }
+    .header-actions{ order:2; gap:6px; }
+    nav{ order:3; width:100%; gap:16px; flex-wrap:wrap; font-size:11px; }
+    .theme-btn{ padding:7px 9px; font-size:10.5px; }
+    #profileBtn .user-badge{ display:none; } /* avatar circle only on small screens; full name is in the profile modal */
+    #profileBtn{ padding:7px 8px; }
 
-  .section-inner{ padding:36px 16px; }
-  .section-title{ font-size:clamp(20px,6vw,26px); }
-  .features-grid{ grid-template-columns:1fr; }
-  .choose-us-stats{ grid-template-columns:1fr 1fr; }
-}
+    h1{ font-size:clamp(26px,7vw,38px); }
+    .hero-sub{ font-size:14.5px; }
+    .owasp-strip{ margin-top:24px; }
+    .owasp-chip{ font-size:10px; padding:5px 8px; }
 
-@media (max-width:420px){
-  .brand-text .t1{ font-size:13px; }
-  .brand-text .t2{ font-size:9.5px; }
-  .brand-mark{ width:28px; height:28px; }
-  nav{ font-size:10px; gap:10px; }
-  .owasp-strip{ gap:6px; }
-  .sum-cell{ padding:10px 8px; }
-  .sum-cell .n{ font-size:18px; }
-  #themeToggle{ font-size:0; padding:7px 8px; gap:0; }
-}
+    .actions{ flex-wrap:wrap; }
+    .sample-btn{ flex:1 1 100%; order:2; text-align:center; }
+    .scan-btn{ flex:1 1 100%; order:1; justify-content:center; }
+
+    .summary-bar{ flex-wrap:wrap; }
+    .sum-cell{ flex:1 1 50%; border-right:none; border-bottom:1px solid var(--line); }
+    .sum-cell:nth-child(2n){ border-right:none; }
+
+    textarea{ min-height:280px; font-size:13.5px; padding:14px; }
+
+    .finding-head{ padding:14px; gap:10px; }
+    .finding-title{ font-size:13.5px; }
+    .finding-body{ padding:0 14px 16px 14px; }
+
+    .modal-card{ padding:22px 18px; max-width:100%; }
+
+    .panel-head{ padding:12px 14px; }
+    .url-row{ padding:12px 14px; }
+
+    .section-inner{ padding:36px 16px; }
+    .section-title{ font-size:clamp(20px,6vw,26px); }
+    .features-grid{ grid-template-columns:1fr; }
+    .choose-us-stats{ grid-template-columns:1fr 1fr; }
+  }
+
+  @media (max-width:420px){
+    .brand-text .t1{ font-size:13px; }
+    .brand-text .t2{ font-size:9.5px; }
+    .brand-mark{ width:28px; height:28px; }
+    nav{ font-size:10px; gap:10px; }
+    .owasp-strip{ gap:6px; }
+    .sum-cell{ padding:10px 8px; }
+    .sum-cell .n{ font-size:18px; }
+    #themeToggle{ font-size:0; padding:7px 8px; gap:0; }
+  }
 </style>
 </head>
 <body>
 
-<!-- ===================== AUTH SCREEN ===================== -->
-<div id="authScreen" class="auth-screen">
-  <div class="auth-card">
-    <div class="brand" style="justify-content:center;margin-bottom:22px;">
-      <div class="brand-mark"></div>
-      <div class="brand-text">
-        <div class="t1">AUDIT BENCH</div>
-        <div class="t2">sign in to continue</div>
-      </div>
-    </div>
-
-    <div id="authError" class="auth-error" style="display:none;"></div>
-    <div id="authNotice" class="auth-notice" style="display:none;"></div>
-
-    <button id="googleLoginBtn" class="google-btn" type="button">
-      <svg width="18" height="18" viewBox="0 0 18 18" xmlns="http://www.w3.org/2000/svg"><path fill="#4285F4" d="M17.64 9.2c0-.64-.06-1.25-.16-1.84H9v3.48h4.84a4.14 4.14 0 0 1-1.8 2.72v2.26h2.9c1.7-1.57 2.7-3.88 2.7-6.62z"/><path fill="#34A853" d="M9 18c2.43 0 4.47-.8 5.96-2.18l-2.9-2.26c-.8.54-1.84.86-3.06.86-2.35 0-4.34-1.59-5.05-3.72H.96v2.33A9 9 0 0 0 9 18z"/><path fill="#FBBC05" d="M3.95 10.7A5.4 5.4 0 0 1 3.67 9c0-.59.1-1.17.28-1.7V4.97H.96A9 9 0 0 0 0 9c0 1.45.35 2.83.96 4.03l2.99-2.33z"/><path fill="#EA4335" d="M9 3.58c1.32 0 2.5.45 3.44 1.35l2.58-2.58C13.46.89 11.43 0 9 0A9 9 0 0 0 .96 4.97l2.99 2.33C4.66 5.17 6.65 3.58 9 3.58z"/></svg>
-      Continue with Google
-    </button>
-
-    <div class="auth-divider"><span>or</span></div>
-
-    <form id="authForm">
-      <label class="auth-label" for="authEmail">Email</label>
-      <input type="email" id="authEmail" class="auth-input" required autocomplete="email">
-      <label class="auth-label" for="authPassword">Password</label>
-      <input type="password" id="authPassword" class="auth-input" required autocomplete="current-password" minlength="6">
-
-      <button type="submit" id="authSubmitBtn" class="auth-submit">Log in</button>
-    </form>
-
-    <div class="auth-toggle">
-      <span id="authToggleText">Don't have an account?</span>
-      <button id="authToggleBtn" type="button">Sign up</button>
-    </div>
-  </div>
-</div>
+<!-- ===================== SESSION GATE ===================== -->
+<!-- Shown briefly while we check whether there's a logged-in Supabase
+     session. If there isn't one, the visitor is redirected to the
+     standalone auth.html page instead of showing a login form here. -->
+<div id="gateScreen" class="gate-screen">Checking your session…</div>
 
 <!-- ===================== MAIN APP (hidden until logged in) ===================== -->
 <div id="appContent" style="display:none;">
@@ -818,7 +678,7 @@
         <div><span>Signed in with</span><span id="profileProvider">—</span></div>
         <div><span>Account created</span><span id="profileCreated">—</span></div>
       </div>
-      <button class="auth-submit" id="profileLogoutBtn" style="margin-top:18px;background:var(--alarm);">Log out</button>
+      <button class="scan-btn" id="profileLogoutBtn" style="margin-top:18px;width:100%;justify-content:center;">Log out</button>
     </div>
   </div>
 </div>
@@ -1647,30 +1507,29 @@ document.getElementById('zipInput').addEventListener('change', async (e) => {
 });
 </script>
 
-<!-- ===================== AUTH LOGIC (Supabase) ===================== -->
+<!-- ===================== AUTH GATE (Supabase) ===================== -->
 <script>
 // ---------------------------------------------------------------
-// Fill these in with your own Supabase project's values:
-// Dashboard → Project Settings → API
+// This page no longer has its own login form. Instead it checks for
+// a Supabase session on load:
+//   - no session  -> redirect to auth.html (the standalone login page)
+//   - has session -> show the app and populate the profile modal
+//
+// auth.html and this page must point at the SAME Supabase project so
+// the session set by one is recognized by the other.
+// Dashboard → Project Settings → API for these values.
 // ---------------------------------------------------------------
-const SUPABASE_URL = 'https://yocpmmizqnatdgekuvrp.supabase.co';       // e.g. https://xxxxxxx.supabase.co
+const SUPABASE_URL = 'https://yocpmmizqnatdgekuvrp.supabase.co';
 const SUPABASE_ANON_KEY = 'sb_publishable_7Kbovagkw_tDbNhjqJD5EQ_A6Vqa774';
 
-const sb = (SUPABASE_URL.startsWith('http'))
-  ? supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY)
-  : null;
+// Where to send people who aren't logged in. Adjust the path if
+// auth.html lives somewhere else relative to this file.
+const LOGIN_PAGE = 'auth.html';
 
-const authScreen = document.getElementById('authScreen');
+const sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+const gateScreen = document.getElementById('gateScreen');
 const appContent = document.getElementById('appContent');
-const authForm = document.getElementById('authForm');
-const authEmail = document.getElementById('authEmail');
-const authPassword = document.getElementById('authPassword');
-const authSubmitBtn = document.getElementById('authSubmitBtn');
-const authError = document.getElementById('authError');
-const authNotice = document.getElementById('authNotice');
-const authToggleBtn = document.getElementById('authToggleBtn');
-const authToggleText = document.getElementById('authToggleText');
-const googleLoginBtn = document.getElementById('googleLoginBtn');
 const userBadge = document.getElementById('userBadge');
 
 // Profile modal wiring
@@ -1689,84 +1548,8 @@ profileBtn.addEventListener('click', () => profileModal.classList.add('open'));
 profileClose.addEventListener('click', () => profileModal.classList.remove('open'));
 profileModal.addEventListener('click', (e) => { if(e.target === profileModal) profileModal.classList.remove('open'); });
 profileLogoutBtn.addEventListener('click', async () => {
-  if(!sb) return;
   await sb.auth.signOut();
-  profileModal.classList.remove('open');
-});
-
-let mode = 'login'; // 'login' | 'signup'
-
-function showAuthError(msg){
-  authNotice.style.display = 'none';
-  authError.textContent = msg;
-  authError.style.display = 'block';
-}
-function showAuthNotice(msg){
-  authError.style.display = 'none';
-  authNotice.textContent = msg;
-  authNotice.style.display = 'block';
-}
-function clearAuthMessages(){
-  authError.style.display = 'none';
-  authNotice.style.display = 'none';
-}
-
-authToggleBtn.addEventListener('click', () => {
-  mode = mode === 'login' ? 'signup' : 'login';
-  authSubmitBtn.textContent = mode === 'login' ? 'Log in' : 'Sign up';
-  authToggleText.textContent = mode === 'login' ? "Don't have an account?" : 'Already have an account?';
-  authToggleBtn.textContent = mode === 'login' ? 'Sign up' : 'Log in';
-  clearAuthMessages();
-});
-
-authForm.addEventListener('submit', async (e) => {
-  e.preventDefault();
-  if(!sb){
-    showAuthError('Auth isn\'t configured yet — set SUPABASE_URL and SUPABASE_ANON_KEY at the top of this script.');
-    return;
-  }
-  clearAuthMessages();
-  authSubmitBtn.disabled = true;
-  authSubmitBtn.textContent = mode === 'login' ? 'Logging in…' : 'Signing up…';
-
-  const email = authEmail.value.trim();
-  const password = authPassword.value;
-
-  try{
-    if(mode === 'login'){
-      const { error } = await sb.auth.signInWithPassword({ email, password });
-      if(error) throw error;
-      // onAuthStateChange below handles showing the app
-    } else {
-      const { error } = await sb.auth.signUp({ email, password });
-      if(error) throw error;
-      showAuthNotice('Check your inbox to confirm your email, then log in.');
-      mode = 'login';
-      authSubmitBtn.textContent = 'Log in';
-      authToggleText.textContent = "Don't have an account?";
-      authToggleBtn.textContent = 'Sign up';
-    }
-  } catch(err){
-    showAuthError(err.message || 'Something went wrong. Try again.');
-  } finally{
-    authSubmitBtn.disabled = false;
-    if(authSubmitBtn.textContent.includes('…')){
-      authSubmitBtn.textContent = mode === 'login' ? 'Log in' : 'Sign up';
-    }
-  }
-});
-
-googleLoginBtn.addEventListener('click', async () => {
-  if(!sb){
-    showAuthError('Auth isn\'t configured yet — set SUPABASE_URL and SUPABASE_ANON_KEY at the top of this script.');
-    return;
-  }
-  clearAuthMessages();
-  const { error } = await sb.auth.signInWithOAuth({
-    provider: 'google',
-    options: { redirectTo: window.location.origin + window.location.pathname }
-  });
-  if(error) showAuthError(error.message);
+  window.location.href = LOGIN_PAGE;
 });
 
 function initials(name, email){
@@ -1776,28 +1559,26 @@ function initials(name, email){
   return src.slice(0,2).toUpperCase();
 }
 
-function setLoggedIn(user){
-  authScreen.style.display = 'none';
-  appContent.style.display = '';
+function isSafeHttpsUrl(u){
+  try{ return new URL(u).protocol === 'https:'; } catch(e){ return false; }
+}
 
-  // Strip any leftover #access_token=... (or similar) from the address bar
-  // once we've processed it — otherwise it lingers and gets reused as the
-  // redirect target on the next login attempt, breaking the OAuth flow.
-  if(window.location.hash){
-    history.replaceState(null, '', window.location.pathname + window.location.search);
-  }
+function showApp(user){
+  gateScreen.style.display = 'none';
+  appContent.style.display = '';
 
   const meta = user.user_metadata || {};
   const name = meta.full_name || meta.name || '';
   const avatarUrl = meta.avatar_url || meta.picture || '';
   const provider = (user.app_metadata && user.app_metadata.provider) || 'email';
-  const created = user.created_at ? new Date(user.created_at).toLocaleDateString(undefined, { year:'numeric', month:'long', day:'numeric' }) : '—';
+  const created = user.created_at
+    ? new Date(user.created_at).toLocaleDateString(undefined, { year:'numeric', month:'long', day:'numeric' })
+    : '—';
 
   userBadge.textContent = name || user.email || '';
 
   const profileAvatarEl = document.getElementById('profileAvatar');
   profileAvatarEl.textContent = '';
-  const isSafeHttpsUrl = (u) => { try{ return new URL(u).protocol === 'https:'; } catch(e){ return false; } };
   if(avatarUrl && isSafeHttpsUrl(avatarUrl)){
     const img = document.createElement('img');
     img.src = avatarUrl;
@@ -1822,30 +1603,26 @@ function setLoggedIn(user){
     profileAvatarFallback.textContent = initials(name, user.email);
   }
 }
-function setLoggedOut(){
-  appContent.style.display = 'none';
-  authScreen.style.display = 'flex';
-  authEmail.value = '';
-  authPassword.value = '';
-  clearAuthMessages();
-  profileModal.classList.remove('open');
+
+function goToLogin(){
+  window.location.href = LOGIN_PAGE;
 }
 
-if(sb){
-  sb.auth.onAuthStateChange((_event, session) => {
-    if(session && session.user) setLoggedIn(session.user);
-    else setLoggedOut();
-  });
-  // Initial check in case onAuthStateChange doesn't fire immediately
-  sb.auth.getSession().then(({ data }) => {
-    if(data.session && data.session.user) setLoggedIn(data.session.user);
-    else setLoggedOut();
-  });
-} else {
-  // Not configured yet — show the auth screen with a clear message
-  // instead of silently locking people out with no explanation.
-  showAuthError('Auth isn\'t configured yet — set SUPABASE_URL and SUPABASE_ANON_KEY at the top of the last script block in this file.');
-}
+// Check session on load, then keep listening in case it changes
+// (e.g. token expiry, or the user logs out in another tab).
+sb.auth.getSession().then(({ data }) => {
+  if(data.session && data.session.user){
+    showApp(data.session.user);
+  } else {
+    goToLogin();
+  }
+});
+
+sb.auth.onAuthStateChange((_event, session) => {
+  if(!session){
+    goToLogin();
+  }
+});
 </script>
 
 </body>
